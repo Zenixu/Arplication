@@ -7,6 +7,33 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.8] - 2026-11-02
+
+# v1.9.8 — Homescreen bento
+
+## Baru
+- **Homescreen baru, bukan grid seragam lagi.** Empat bagian:
+  - **Sedang berjalan** — kartu pemutar hitam berisi lagu yang sedang diputar,
+    progress bar, dan waktu. Ketuk untuk membuka ArMusic.
+  - **Terakhir diputar** — tiga kartu geser ke samping.
+  - **Aktivitas** — jumlah file terunduh (Arloader) dan catatan yang di-pin (ArNote).
+  - **Alat** — bento 4 kolom: kartu lebar (ARLOADER, ARMUSIC), kartu tinggi
+    (Ardoro, ArToolbox), dan kartu kotak. Tombol "lihat semua" membuka daftar
+    lengkap berisi deskripsi tiap modul.
+- **Status pemutar tersimpan** (`src/services/nowPlaying.js`). ArMusic menulis
+  potret "sedang diputar" + riwayat putar tiap 5 detik, jadi homescreen bisa
+  menampilkannya tanpa membuka modul lebih dulu.
+
+## Perbaikan
+- Banner kuning besar "Ruang Utilitas Terpadu" dihapus — judul aplikasi sudah ada
+  di header, jadi tidak perlu diulang.
+- Angka di kartu aktivitas diambil dari data nyata (riwayat unduhan & catatan
+  yang di-pin). Kalau belum ada data, tampil 0 dengan keterangan, bukan angka
+  karangan.
+
+## Catatan
+- Desain: `~/figcraft/home-redesign.figcraft` (frame "Home · Opsi B — Feed").
+
 ## [1.9.7] - 2026-11-02
 
 # v1.9.7 — Bagian atas diringkas

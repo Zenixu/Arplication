@@ -6,6 +6,7 @@ import {
   SlidersHorizontal, Timer, TimerOff, ListPlus, Plus, X, Pencil, Check,
 } from 'lucide-react';
 import { isNative } from '../../../services/http.js';
+import { saveNowPlaying, pushRecentPlay } from '../../../services/nowPlaying.js';
 import { loadLibrary, saveLibrary, addOrUpdateTrackInLibrary, removeTrack, mergeScanResults, scanLocalAudio, toPlayableSrc, formatTrackDuration, isAudioFilename, } from '../../../services/localMusic.js';
 import { publishNowPlaying, setPlaybackState, setPositionState, clearNowPlaying, showNativeNowPlaying, dismissNativeNowPlaying, onNativeMediaControl, nativePlaybackSupported, shouldUseNativePlayback, playNativeQueue, updateNativeQueue, pauseNativePlayback, resumeNativePlayback, nextNativeTrack, prevNativeTrack, stopNativePlayback, seekNativePlayback, getNativePlaybackState, getNativeEqualizer, setNativeEqualizerEnabled, setNativeEqualizerBand, setNativeEqualizerPreset, setNativeSleepTimer, getNativeSleepTimer, formatEqFreq, formatEqGain, formatSleepRemaining, } from '../../../services/armusicNative.js';
 import { loadPlaylists, savePlaylists, createPlaylist, renamePlaylist, deletePlaylist, addTrackToPlaylist, removeTrackFromPlaylist, resolvePlaylistTracks, purgeTrackFromPlaylists, isTrackInPlaylist, groupTracksBy, } from '../../../services/playlistManager.js';
@@ -191,6 +192,27 @@ export default function ArMusicModule({ setActiveTab }) {
     ? nowPlayingTrack
     : (tracks.find((t) => t.id === currentId) || null);
 
+  // ---- potret "sedang diputar" untuk homescreen -------------------------
+  // Ditulis tiap 5 detik saja (bukan tiap timeupdate) supaya tidak boros.
+  const elapsedRef = useRef(0);
+  useEffect(() => { elapsedRef.current = elapsed; }, [elapsed]);
+
+  useEffect(() => {
+    if (!current) return undefined;
+    const write = () => saveNowPlaying({
+      title: current.title,
+      artist: current.artist,
+      cover: current.cover,
+      duration,
+      elapsed: elapsedRef.current,
+      playing,
+    });
+    write();
+    const id = setInterval(write, 5000);
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current && (current.id || current.videoId), duration, playing]);
+
   const persist = (next) => {
     setTracks(next);
     saveLibrary(next);
@@ -315,6 +337,9 @@ export default function ArMusicModule({ setActiveTab }) {
   const playTrack = async (track, forceReplay = false, queueOverride = null) => {
     if (!track || track.unavailable) return;
     setError(null);
+    // Catat untuk homescreen: "sedang berjalan" + riwayat putar.
+    // Diletakkan sebelum cabang native/WebView supaya kedua jalur tercatat.
+    pushRecentPlay(track);
     // Catat antrean sumber lebih dulu: jalur native MAUPUN WebView butuh ini
     // supaya "berikutnya" tetap di dalam hasil pencarian, bukan ke library.
     if (Array.isArray(queueOverride) && queueOverride.length > 0) {

@@ -1,229 +1,305 @@
-import React from 'react';
-import { 
-  Download, Timer, FileText, Info, ArrowRight, Zap, Sparkles, 
-  Layers, Smartphone, CheckCircle2
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Play, Pause, Music2, ArrowRight, ChevronRight, Download, StickyNote, Layers,
 } from 'lucide-react';
-import { APP_VERSION } from '../../services/updater.js';
+import { getDownloadHistory } from '../../utils/history.js';
+import { getAllNotes } from '../../services/notesDb.js';
+import { readNowPlaying, readRecentPlays } from '../../services/nowPlaying.js';
+import { ARMUSIC_LIBRARY_KEY } from '../../services/localMusic.js';
+
+/**
+ * Homescreen "bento" — mengikuti desain di ~/figcraft/home-redesign.figcraft.
+ *
+ *   SEDANG BERJALAN  → kartu pemutar (klik = buka ArMusic)
+ *   TERAKHIR DIPUTAR → geser ke samping
+ *   AKTIVITAS        → jumlah unduhan + catatan yang di-pin
+ *   ALAT             → bento 4 kolom (kartu lebar & tinggi bervariasi)
+ *
+ * Semua data dibaca dari penyimpanan lokal modul masing-masing. Kalau datanya
+ * belum ada, kartu menampilkan keadaan kosong — bukan angka karangan.
+ */
+
+const MODULES = [
+  { id: 'arloader',  title: 'Arloader',  short: 'Arloader',  desc: 'Unduh video & audio', icon: '/arloader.png',  accent: '#FFE600', span: 'col-span-2' },
+  { id: 'armaps',    title: 'ArMaps',    short: 'Armaps',    desc: 'Peta offline',        icon: '/armaps.png',    accent: '#D8B4FE', span: 'col-span-1' },
+  { id: 'ardoro',    title: 'Ardoro',    short: 'Ardoro',    desc: 'Timer fokus',         icon: '/ardoro.png',    accent: '#FF70A6', span: 'col-span-1 row-span-2' },
+  { id: 'artoolbox', title: 'ArToolbox', short: 'Artoolbox', desc: 'Perkakas praktis',    icon: '/artoolbox.png', accent: '#9AD7FF', span: 'col-span-1 row-span-2' },
+  { id: 'arnote',    title: 'ArNote',    short: 'Arnotes',   desc: 'Catatan & checklist', icon: '/arnote.png',    accent: '#C6F24E', span: 'col-span-1' },
+  { id: 'aruthtale', title: 'Aruthtale', short: 'Aruthtale', desc: 'Info & diagnostik',   icon: '/logo.png',      accent: '#E7E3D8', span: 'col-span-1' },
+  { id: 'argame',    title: 'ArGame',    short: 'Argame',    desc: 'Game santai',         icon: '/Argame.png',    accent: '#FFC46B', span: 'col-span-1' },
+  { id: 'armusic',   title: 'ArMusic',   short: 'Armusic',   desc: 'Pemutar musik',       icon: '/armusic.png',   accent: '#C6F24E', span: 'col-span-2' },
+];
+
+function readLibraryCount() {
+  if (typeof localStorage === 'undefined') return 0;
+  try {
+    const list = JSON.parse(localStorage.getItem(ARMUSIC_LIBRARY_KEY) || '[]');
+    return Array.isArray(list) ? list.length : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function formatTime(sec) {
+  const total = Math.max(0, Math.floor(Number(sec) || 0));
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`;
+}
 
 export default function HomeHub({ setActiveTab }) {
-  const modules = [
-    {
-      id: 'arloader',
-      title: 'Arloader',
-      tagline: 'Media Downloader',
-      description: 'Unduh video & audio MP3 dari YouTube, Spotify, TikTok, & IG.',
-      iconUrl: '/arloader.png',
-      status: 'Aktif',
-      statusColor: 'bg-[#38E54D]',
-      cardBg: 'bg-[#FFFFFF]',
-      accentColor: '#38E54D',
-      badgeBg: 'bg-[#38E54D]',
-      actionLabel: 'Buka',
-      isReady: true,
-    },
-    {
-      id: 'arnote',
-      title: 'ArNote',
-      tagline: 'Bento Notes & Widget',
-      description: 'Catatan offline-first, checklist interaktif, & widget homescreen.',
-      iconUrl: '/arnote.png',
-      status: 'Aktif',
-      statusColor: 'bg-[#FFE600]',
-      cardBg: 'bg-[#FFFFFF]',
-      accentColor: '#FFE600',
-      badgeBg: 'bg-[#FFE600]',
-      actionLabel: 'Buka',
-      isReady: true,
-    },
-    {
-      id: 'ardoro',
-      title: 'Ardoro',
-      tagline: 'Focus & Pomodoro',
-      description: 'Timer Pomodoro offline dengan interval kustom & statistik sesi.',
-      iconUrl: '/ardoro.png',
-      status: 'Aktif',
-      statusColor: 'bg-[#FF70A6]',
-      cardBg: 'bg-[#FFFFFF]',
-      accentColor: '#FF70A6',
-      badgeBg: 'bg-[#FF70A6]',
-      actionLabel: 'Buka',
-      isReady: true,
-    },
-    {
-      id: 'armusic',
-      title: 'ArMusic',
-      tagline: 'Pemutar Lokal',
-      description: 'Putar lagu dari storage HP — hasil unduhan Arloader & file musik, offline.',
-      iconUrl: '/armusic.png',
-      status: 'Aktif',
-      statusColor: 'bg-[#D8B4FE]',
-      cardBg: 'bg-[#FFFFFF]',
-      accentColor: '#D8B4FE',
-      badgeBg: 'bg-[#D8B4FE]',
-      actionLabel: 'Buka',
-      isReady: true,
-    },
-    {
-      id: 'armaps',
-      title: 'ArMaps',
-      tagline: 'Peta Offline',
-      description: 'Unduh peta wilayah pilihanmu, lalu pakai tanpa kuota. Ada titik lokasi saya.',
-      iconUrl: '/armaps.png',
-      status: 'Aktif',
-      statusColor: 'bg-[#C4FAF8]',
-      cardBg: 'bg-[#FFFFFF]',
-      accentColor: '#C4FAF8',
-      badgeBg: 'bg-[#C4FAF8]',
-      actionLabel: 'Buka',
-      isReady: true,
-    },
-    {
-      id: 'artoolbox',
-      title: 'ArToolbox',
-      tagline: 'Perkakas Praktis',
-      description: 'QR scanner/generator, dev text tools, kalkulator praktis, & color studio.',
-      iconUrl: '/artoolbox.png',
-      status: 'Aktif',
-      statusColor: 'bg-[#C4FAF8]',
-      cardBg: 'bg-[#FFFFFF]',
-      accentColor: '#C4FAF8',
-      badgeBg: 'bg-[#C4FAF8]',
-      actionLabel: 'Buka',
-      isReady: true,
-    },
-    {
-      id: 'argame',
-      title: 'ArGame',
-      tagline: 'Mini Arcade Hub',
-      description: 'Koleksi game santai & asah otak offline. Dimulai dari Sudoku 9x9 dengan validasi cerdas.',
-      iconUrl: '/Argame.png',
-      status: 'Aktif',
-      statusColor: 'bg-[#FF8B3D]',
-      cardBg: 'bg-[#FFFFFF]',
-      accentColor: '#FF8B3D',
-      badgeBg: 'bg-[#FF8B3D]',
-      actionLabel: 'Mainkan',
-      isReady: true,
-    },
-    {
-      id: 'aruthtale',
-      title: 'Aruthtale',
-      tagline: 'Info & Diagnostik',
-      description: 'Status sistem, diagnostik perangkat, & info versi studio.',
-      iconUrl: '/logo.png',
-      status: 'Siap',
-      statusColor: 'bg-[#A076F9]',
-      cardBg: 'bg-[#FFFFFF]',
-      accentColor: '#A076F9',
-      badgeBg: 'bg-[#A076F9]',
-      actionLabel: 'Lihat',
-      isReady: true,
-    },
-  ];
+  const [nowPlaying, setNowPlaying] = useState(() => readNowPlaying());
+  const [recent, setRecent] = useState(() => readRecentPlays(3));
+  const [downloads, setDownloads] = useState(() => getDownloadHistory().length);
+  const [libraryCount, setLibraryCount] = useState(() => readLibraryCount());
+  const [pinnedNotes, setPinnedNotes] = useState(0);
+  const [noteCount, setNoteCount] = useState(0);
+  const [showAll, setShowAll] = useState(false);
+
+  // Muat ulang data saat layar kembali aktif / aplikasi dibuka lagi.
+  useEffect(() => {
+    let alive = true;
+
+    const refresh = async () => {
+      setNowPlaying(readNowPlaying());
+      setRecent(readRecentPlays(3));
+      setDownloads(getDownloadHistory().length);
+      setLibraryCount(readLibraryCount());
+      try {
+        const notes = await getAllNotes();
+        if (!alive || !Array.isArray(notes)) return;
+        setNoteCount(notes.length);
+        setPinnedNotes(notes.filter((n) => n && n.isPinned).length);
+      } catch {
+        /* IndexedDB belum siap / tidak tersedia — biarkan 0 */
+      }
+    };
+
+    refresh();
+    const timer = setInterval(refresh, 15000);
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+
+    return () => {
+      alive = false;
+      clearInterval(timer);
+      window.removeEventListener('focus', refresh);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, []);
+
+  const progress = useMemo(() => {
+    if (!nowPlaying || !nowPlaying.duration) return 0;
+    return Math.min(100, Math.max(0, (nowPlaying.elapsed / nowPlaying.duration) * 100));
+  }, [nowPlaying]);
+
+  const open = (id) => setActiveTab?.(id);
 
   return (
-    <div className="space-y-3.5 sm:space-y-5 font-sans">
-      {/* Hero Welcome Banner */}
-      <div className="p-4 sm:p-5 bg-[#FFE600] rounded-2xl border-[2.5px] border-[#121212] shadow-[4px_4px_0px_#121212] space-y-3">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white border-2 border-[#121212] shadow-[1.5px_1.5px_0px_#121212]">
-            <img src="/logo.png" alt="Aruthtale Emblem" className="w-3.5 h-3.5 object-contain" />
-            <span className="text-[10px] font-mono-code font-black uppercase tracking-wider text-[#121212]">
-              ARUTHTALE STUDIO
-            </span>
-          </div>
+    <div className="space-y-4 font-sans">
+      {/* ============================ SEDANG BERJALAN ============================ */}
+      <section className="space-y-2">
+        <h2 className="px-1 text-[9px] font-mono-code font-black uppercase tracking-widest text-[#121212]/45">
+          Sedang berjalan
+        </h2>
 
-          <div className="flex items-center gap-1.5 font-mono-code text-[10px] font-black bg-white px-2 py-0.5 rounded-md border border-[#121212] shadow-[1px_1px_0px_#121212]">
-            <span className="w-2 h-2 rounded-full bg-[#38E54D] border border-[#121212] animate-pulse" />
-            <span>v{APP_VERSION} BETA</span>
-          </div>
-        </div>
-
-        <div>
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-[#121212] uppercase leading-tight">
-            Ruang Utilitas Terpadu
-          </h1>
-          <p className="text-xs font-bold text-gray-800 leading-relaxed mt-1">
-            Utilitas harian offline-first: pengunduh media, pemutar musik lokal, pencatatan bento dengan widget homescreen, dan fokus timer.
-          </p>
-        </div>
-
-        {/* Feature Pills */}
-        <div className="flex flex-wrap gap-1.5 pt-1 text-[11px] font-mono-code font-bold">
-          <div className="flex items-center gap-1 bg-white px-2.5 py-1 rounded-lg border border-[#121212] shadow-[1.5px_1.5px_0px_#121212]">
-            <Zap className="w-3 h-3 text-[#121212]" />
-            <span>Cepat & Hemat</span>
-          </div>
-          <div className="flex items-center gap-1 bg-[#C4FAF8] px-2.5 py-1 rounded-lg border border-[#121212] shadow-[1.5px_1.5px_0px_#121212]">
-            <Layers className="w-3 h-3 text-[#121212]" />
-            <span>Widget Native</span>
-          </div>
-          <div className="flex items-center gap-1 bg-[#38E54D] px-2.5 py-1 rounded-lg border border-[#121212] shadow-[1.5px_1.5px_0px_#121212]">
-            <Smartphone className="w-3 h-3 text-[#121212]" />
-            <span>100% Offline</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Modules Bento Grid (1 baris = 2 kotak di mobile!) */}
-      <div className="space-y-2.5 pt-1">
-        <div className="flex items-center justify-between px-1">
-          <h2 className="text-xs font-black uppercase tracking-wider text-[#121212] flex items-center gap-1.5">
-            <span>DAFTAR MODUL APLIKASI</span>
-          </h2>
-          <span className="text-[9.5px] font-mono-code font-black bg-white px-2 py-0.5 rounded border border-black shadow-[1px_1px_0px_#121212]">
-            7 MODUL
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2.5 sm:gap-3.5">
-          {modules.map((mod) => (
-            <div
-              key={mod.id}
-              onClick={() => setActiveTab(mod.id)}
-              className={`p-3 sm:p-4 rounded-xl border-2 border-[#121212] shadow-[3px_3px_0px_#121212] hover:shadow-[4px_4px_0px_#121212] hover:-translate-y-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0px_#121212] transition-all flex flex-col justify-between cursor-pointer select-none ${mod.cardBg}`}
-            >
-              <div>
-                {/* Icon & Status Pill */}
-                <div className="flex items-start justify-between gap-1.5 mb-2">
-                  <div
-                    className="w-9 h-9 rounded-xl border-2 border-[#121212] flex items-center justify-center shadow-[1.5px_1.5px_0px_#121212] overflow-hidden p-1 shrink-0"
-                    style={{ backgroundColor: mod.accentColor }}
-                  >
-                    <img src={mod.iconUrl} alt={mod.title} className="w-full h-full object-contain" />
-                  </div>
-
-                  <span className={`text-[9px] font-mono-code font-black px-2 py-0.5 rounded-md border border-[#121212] shadow-[1px_1px_0px_#121212] ${mod.statusColor} text-[#121212] shrink-0`}>
-                    {mod.status}
-                  </span>
-                </div>
-
-                <h3 className="font-black text-sm sm:text-base text-[#121212] uppercase tracking-tight leading-tight">
-                  {mod.title}
-                </h3>
-                <p className="text-[10px] font-mono-code font-bold text-gray-500 mb-1 truncate">
-                  {mod.tagline}
-                </p>
-                <p className="text-[11px] font-medium text-gray-700 leading-snug line-clamp-2">
-                  {mod.description}
-                </p>
-              </div>
-
-              <div className="mt-3 pt-2 border-t border-[#121212]/15 flex items-center justify-between">
-                <span className="text-[10.5px] font-black uppercase tracking-wider text-[#121212]">
-                  {mod.actionLabel}
-                </span>
-                <div
-                  className="w-5 h-5 rounded-md border border-[#121212] flex items-center justify-center shadow-[1px_1px_0px_#121212]"
-                  style={{ backgroundColor: mod.accentColor }}
-                >
-                  <ArrowRight className="w-3 h-3 text-[#121212]" />
-                </div>
-              </div>
+        {nowPlaying ? (
+          <button
+            onClick={() => open('armusic')}
+            className="w-full text-left bg-[#121212] border-2 border-[#121212] rounded-2xl shadow-[4px_4px_0_#121212] p-3 flex items-center gap-3 active:translate-y-0.5 active:shadow-[2px_2px_0_#121212] transition-all"
+          >
+            <div className="w-16 h-16 rounded-xl border-2 border-[#121212] overflow-hidden shrink-0 bg-[#C6F24E] flex items-center justify-center">
+              {nowPlaying.cover ? (
+                <img src={nowPlaying.cover} alt={nowPlaying.title} className="w-full h-full object-cover" loading="lazy" />
+              ) : (
+                <Music2 className="w-6 h-6 text-[#121212]" />
+              )}
             </div>
+
+            <div className="flex-1 min-w-0">
+              <p className="text-[11.5px] font-black text-white truncate leading-tight">{nowPlaying.title}</p>
+              <p className="text-[9px] font-mono-code font-bold text-white/55 truncate mt-0.5">
+                {nowPlaying.artist || 'ArMusic'} · {nowPlaying.playing ? 'diputar' : 'dijeda'}
+              </p>
+              <div className="mt-1.5 h-1.5 rounded-full bg-white/20 overflow-hidden">
+                <div className="h-full bg-[#FFE600] rounded-full" style={{ width: `${progress}%` }} />
+              </div>
+              <p className="mt-1 text-[8px] font-mono-code font-bold text-white/40">
+                {formatTime(nowPlaying.elapsed)} / {formatTime(nowPlaying.duration)}
+              </p>
+            </div>
+
+            <span className="w-11 h-11 rounded-full bg-[#FFE600] border-2 border-[#121212] flex items-center justify-center shrink-0">
+              {nowPlaying.playing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+            </span>
+          </button>
+        ) : (
+          <button
+            onClick={() => open('armusic')}
+            className="w-full text-left bg-white border-2 border-dashed border-[#121212]/40 rounded-2xl p-3 flex items-center gap-3 hover:border-[#121212] transition-colors"
+          >
+            <div className="w-11 h-11 rounded-xl border-2 border-[#121212]/30 flex items-center justify-center shrink-0 bg-[#F4F1E8]">
+              <Music2 className="w-5 h-5 text-[#121212]/40" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[11px] font-black uppercase">Belum ada lagu diputar</p>
+              <p className="text-[9px] font-mono-code font-bold text-[#121212]/45">
+                {libraryCount > 0 ? `${libraryCount} lagu siap diputar` : 'Tambahkan lagu lewat ArMusic'}
+              </p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-[#121212]/40 shrink-0" />
+          </button>
+        )}
+      </section>
+
+      {/* ============================ TERAKHIR DIPUTAR =========================== */}
+      <section className="space-y-2">
+        <div className="flex items-baseline justify-between px-1">
+          <h2 className="text-[9px] font-mono-code font-black uppercase tracking-widest text-[#121212]/45">
+            Terakhir diputar
+          </h2>
+          {recent.length > 0 && (
+            <button
+              onClick={() => open('armusic')}
+              className="text-[9px] font-mono-code font-black uppercase text-[#121212]/45 hover:text-[#121212]"
+            >
+              lihat semua →
+            </button>
+          )}
+        </div>
+
+        {recent.length === 0 ? (
+          <p className="px-1 text-[10px] font-mono-code font-bold text-[#121212]/35">
+            Riwayat putar akan muncul di sini.
+          </p>
+        ) : (
+          <div className="flex gap-2.5 overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {recent.map((track) => (
+              <button
+                key={track.key}
+                onClick={() => open('armusic')}
+                className="shrink-0 w-[112px] text-left bg-white border-2 border-[#121212] rounded-xl shadow-[3px_3px_0_#121212] p-1.5 active:translate-y-0.5 active:shadow-[1px_1px_0_#121212] transition-all"
+              >
+                <div className="w-full h-[86px] rounded-lg border-2 border-[#121212] overflow-hidden bg-[#C6F24E] flex items-center justify-center mb-1.5">
+                  {track.cover ? (
+                    <img src={track.cover} alt={track.title} className="w-full h-full object-cover" loading="lazy" />
+                  ) : (
+                    <Music2 className="w-5 h-5 text-[#121212]" />
+                  )}
+                </div>
+                <p className="text-[10px] font-black leading-tight truncate">{track.title}</p>
+                <p className="text-[8px] font-mono-code font-bold text-[#121212]/45 truncate">
+                  {track.artist || 'ArMusic'}
+                </p>
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ================================ AKTIVITAS =============================== */}
+      <section className="space-y-2">
+        <h2 className="px-1 text-[9px] font-mono-code font-black uppercase tracking-widest text-[#121212]/45">
+          Aktivitas
+        </h2>
+        <div className="grid grid-cols-2 gap-2.5">
+          <button
+            onClick={() => open('arloader')}
+            className="text-left bg-[#C6F24E] border-2 border-[#121212] rounded-xl shadow-[3px_3px_0_#121212] p-3 active:translate-y-0.5 active:shadow-[1px_1px_0_#121212] transition-all"
+          >
+            <div className="flex items-center gap-1.5 mb-1">
+              <Download className="w-3.5 h-3.5" />
+              <span className="text-[8px] font-mono-code font-black uppercase tracking-wider">Arloader</span>
+            </div>
+            <p className="text-2xl font-black leading-none">{downloads}</p>
+            <p className="text-[8.5px] font-mono-code font-bold text-[#121212]/60 mt-1">file terunduh</p>
+          </button>
+
+          <button
+            onClick={() => open('arnote')}
+            className="text-left bg-[#D8B4FE] border-2 border-[#121212] rounded-xl shadow-[3px_3px_0_#121212] p-3 active:translate-y-0.5 active:shadow-[1px_1px_0_#121212] transition-all"
+          >
+            <div className="flex items-center gap-1.5 mb-1">
+              <StickyNote className="w-3.5 h-3.5" />
+              <span className="text-[8px] font-mono-code font-black uppercase tracking-wider">Pin notes</span>
+            </div>
+            <p className="text-2xl font-black leading-none">{pinnedNotes}</p>
+            <p className="text-[8.5px] font-mono-code font-bold text-[#121212]/60 mt-1">
+              {noteCount > 0 ? `dari ${noteCount} catatan` : 'belum ada catatan'}
+            </p>
+          </button>
+        </div>
+      </section>
+
+      {/* ================================== ALAT ================================= */}
+      <section className="space-y-2">
+        <div className="flex items-baseline justify-between px-1">
+          <h2 className="text-[9px] font-mono-code font-black uppercase tracking-widest text-[#121212]/45">
+            Alat
+          </h2>
+          <button
+            onClick={() => setShowAll((v) => !v)}
+            className="text-[9px] font-mono-code font-black uppercase text-[#121212]/45 hover:text-[#121212]"
+          >
+            {showAll ? 'sembunyikan ↑' : 'lihat semua →'}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-4 gap-2 auto-rows-[74px] md:auto-rows-[86px]">
+          {MODULES.map((mod) => (
+            <button
+              key={mod.id}
+              onClick={() => open(mod.id)}
+              className={`${mod.span} text-left bg-white border-2 border-[#121212] rounded-xl shadow-[3px_3px_0_#121212] p-2 flex flex-col justify-between overflow-hidden active:translate-y-0.5 active:shadow-[1px_1px_0_#121212] transition-all`}
+            >
+              <span
+                className="w-8 h-8 md:w-9 md:h-9 rounded-lg border-2 border-[#121212] flex items-center justify-center overflow-hidden shrink-0"
+                style={{ backgroundColor: mod.accent }}
+              >
+                <img src={mod.icon} alt="" className="w-full h-full object-contain p-0.5" loading="lazy" />
+              </span>
+
+              <span className="block min-w-0">
+                <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-tight leading-tight truncate">
+                  {mod.short}
+                </span>
+                {/* di layar lebar semua tile menampilkan deskripsi singkat */}
+                <span className={`text-[7.5px] font-mono-code font-bold text-[#121212]/45 truncate ${mod.span === 'col-span-2' ? 'block' : 'hidden md:block'}`}>
+                  {mod.desc}
+                </span>
+              </span>
+            </button>
           ))}
         </div>
-      </div>
+
+        {/* daftar lengkap, dibuka lewat "lihat semua" */}
+        {showAll && (
+          <div className="mt-2 space-y-1.5">
+            {MODULES.map((mod) => (
+              <button
+                key={`row-${mod.id}`}
+                onClick={() => open(mod.id)}
+                className="w-full flex items-center gap-2.5 bg-white border-2 border-[#121212] rounded-xl shadow-[2px_2px_0_#121212] p-2 text-left active:translate-y-0.5 active:shadow-[1px_1px_0_#121212] transition-all"
+              >
+                <span
+                  className="w-7 h-7 rounded-md border-2 border-[#121212] flex items-center justify-center overflow-hidden shrink-0"
+                  style={{ backgroundColor: mod.accent }}
+                >
+                  <img src={mod.icon} alt="" className="w-full h-full object-contain p-0.5" loading="lazy" />
+                </span>
+                <span className="flex-1 min-w-0">
+                  <span className="block text-[10px] font-black uppercase truncate">{mod.title}</span>
+                  <span className="block text-[8px] font-mono-code font-bold text-[#121212]/45 truncate">{mod.desc}</span>
+                </span>
+                <ChevronRight className="w-3.5 h-3.5 text-[#121212]/40 shrink-0" />
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <p className="px-1 pb-1 text-[8px] font-mono-code font-bold text-[#121212]/30 flex items-center gap-1">
+        <Layers className="w-3 h-3" />
+        {libraryCount} lagu di koleksi · {downloads} unduhan tersimpan
+      </p>
     </div>
   );
 }
