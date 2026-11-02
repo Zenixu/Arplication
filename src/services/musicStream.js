@@ -44,82 +44,203 @@ function buildInnertubeWatchBody(videoId) {
   };
 }
 
-export async function resolveYouTubeMusicAudioUrl({ videoId = null, url = null, query = '', onProgress = null, quality = '128' } = {}) {
-  const startTime = Date.now();
+/* ---------------------------------------------------------------------------
+ * Orkestrasi resolusi audio
+ *
+ * Pelajaran dari lapangan: lapis cadangan yang "dulu jalan" bisa mati tanpa
+ * pemberitahuan (Innertube 404, Piped 500, Convert1s 451). Kalau urutannya
+ * tidak diatur, tiap lapis mati tetap memakan timeout-nya sendiri sehingga
+ * pengguna menunggu 60-90 detik sebelum sampai ke lapis yang hidup.
+ *
+ * Aturan sekarang:
+ *   1. Cache URL dulu (URL audio berlaku ~6 jam; kita simpan 90 menit).
+ *   2. yt-dlp lebih dulu - itu satu-satunya lapis yang benar-benar hidup.
+ *   3. Lapis lain: timeout pendek + circuit breaker 24 jam kalau gagal.
+ *   4. Kalau server yt-dlp belum diatur, jangan tandai gagal - beri pesan jelas.
+ * ------------------------------------------------------------------------- */
+
+const LAYER_HEALTH_KEY = 'armusic_layer_health';
+const URL_CACHE_KEY = 'armusic_stream_cache';
+const LAYER_TTL_MS = 24 * 60 * 60 * 1000; // lapis gagal dilewati 24 jam
+const URL_TTL_MS = 90 * 60 * 1000; // cache URL audio 90 menit
+const MAX_CACHE_ENTRIES = 200;
+
+function readStore(key, fallback) {
+  try {
+    if (typeof localStorage === 'undefined') return fallback;
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeStore(key, value) {
+  try {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* kuota penuh / mode privat - abaikan */
+  }
+}
+
+/** URL yt-dlp server yang dikonfigurasi pengguna (dipakai bersama Arloader). */
+export function getYtDlpServerUrl() {
+  const settings = readStore('arloader_settings', {}) || {};
+  return String(settings.ytDlpServerUrl || '').trim().replace(/\/+$/, '');
+}
+
+function isLayerBlocked(name) {
+  const health = readStore(LAYER_HEALTH_KEY, {}) || {};
+  const entry = health[name];
+  return Boolean(entry && entry.until && entry.until > Date.now());
+}
+
+function markLayerFailed(name, reason = '') {
+  const health = readStore(LAYER_HEALTH_KEY, {}) || {};
+  health[name] = { until: Date.now() + LAYER_TTL_MS, reason: String(reason).slice(0, 160), at: Date.now() };
+  writeStore(LAYER_HEALTH_KEY, health);
+  console.warn(`[ArMusic] lapis "${name}" dilewati 24 jam: ${reason}`);
+}
+
+function markLayerOk(name) {
+  const health = readStore(LAYER_HEALTH_KEY, {}) || {};
+  if (health[name]) {
+    delete health[name];
+    writeStore(LAYER_HEALTH_KEY, health);
+  }
+}
+
+/** Ringkasan kesehatan lapis - dipakai UI untuk diagnosa. */
+export function getLayerHealth() {
+  return readStore(LAYER_HEALTH_KEY, {}) || {};
+}
+
+/** Pulihkan semua lapis ("coba lagi semua sumber"). */
+export function resetLayerHealth() {
+  writeStore(LAYER_HEALTH_KEY, {});
+}
+
+function cacheGet(videoId) {
+  const cache = readStore(URL_CACHE_KEY, {}) || {};
+  const entry = cache[videoId];
+  if (!entry) return null;
+  if (!entry.expiresAt || entry.expiresAt <= Date.now()) {
+    delete cache[videoId];
+    writeStore(URL_CACHE_KEY, cache);
+    return null;
+  }
+  return entry.url || null;
+}
+
+function cacheSet(videoId, url) {
+  const cache = readStore(URL_CACHE_KEY, {}) || {};
+  cache[videoId] = { url, expiresAt: Date.now() + URL_TTL_MS };
+  const keys = Object.keys(cache);
+  if (keys.length > MAX_CACHE_ENTRIES) {
+    keys
+      .sort((a, b) => (cache[a].expiresAt || 0) - (cache[b].expiresAt || 0))
+      .slice(0, keys.length - MAX_CACHE_ENTRIES)
+      .forEach((k) => delete cache[k]);
+  }
+  writeStore(URL_CACHE_KEY, cache);
+}
+
+/** Batasi waktu satu lapis supaya lapis mati tidak menyandera pengguna. */
+function withTimeout(promise, ms, label) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error(`${label} timeout ${Math.round(ms / 1000)}s`)),
+      ms,
+    );
+    Promise.resolve(promise).then(
+      (v) => {
+        clearTimeout(timer);
+        resolve(v);
+      },
+      (e) => {
+        clearTimeout(timer);
+        reject(e);
+      },
+    );
+  });
+}
+
+/**
+ * Resolve audio URL untuk satu track YouTube Music.
+ * Urutan: cache -> yt-dlp (remote/local) -> Piped -> all-in-one -> Innertube -> Convert1s.
+ */
+export async function resolveYouTubeMusicAudioUrl({
+  videoId = null,
+  url = null,
+  query = '',
+  onProgress = null,
+  quality = '128',
+} = {}) {
+  const startedAt = Date.now();
   const vid = videoId || extractVideoIdFromUrl(url) || (query ? await extractVideoIdFromQuery(query) : null);
-  if (!vid) {
-    throw new Error('ID Video YouTube tidak valid atau tidak bisa diekstrak.');
+  if (!vid) throw new Error('ID Video YouTube tidak valid atau tidak bisa diekstrak.');
+
+  const cached = cacheGet(vid);
+  if (cached) {
+    if (onProgress) onProgress(100, 'Memakai tautan tersimpan...');
+    console.log(`[ArMusic] cache hit untuk ${vid} (${Date.now() - startedAt}ms)`);
+    return cached;
   }
 
-  // Prioritas 1: Innertube direkt (streaming via YouTube Music API)
-  try {
-    const audioUrl = await resolveInnertubeStream(vid, onProgress);
-    if (audioUrl) {
-      console.log(`[YouTube Music] Berhasil resolve stream Innertube dalam ${Date.now() - startTime}ms`);
-      return audioUrl;
-    }
-  } catch (err) {
-    console.warn('[YouTube Music] Innertube stream failed, fallback:', err?.message || err);
-  }
+  const serverUrl = getYtDlpServerUrl();
 
-  // Prioritas 2: Piped stream (sudah ada di youtube.js, works untuk sebagian besar)
-  try {
-    const audioUrl = await resolvePipedStream(vid, onProgress);
-    if (audioUrl) {
-      console.log(`[YouTube Music] Berhasil resolve stream Piped dalam ${Date.now() - startTime}ms`);
-      return audioUrl;
-    }
-  } catch (err) {
-    console.warn('[YouTube Music] Piped stream failed, fallback:', err?.message || err);
-  }
+  const layers = [
+    {
+      name: 'ytdlp-remote',
+      ms: 25000,
+      when: () => Boolean(serverUrl) && isNative(),
+      run: () => resolveYtDlpRemote(vid, quality, onProgress),
+    },
+    {
+      name: 'ytdlp-local',
+      ms: 20000,
+      when: () => isLocalWeb(),
+      run: () => resolveYtDlpLocal(vid, quality, onProgress),
+    },
+    { name: 'piped', ms: 6000, run: () => resolvePipedStream(vid, onProgress) },
+    { name: 'all-in-one', ms: 20000, run: () => resolveYouTubeMusicAllInOne(vid, query, onProgress) },
+    { name: 'innertube', ms: 6000, run: () => resolveInnertubeStream(vid, onProgress) },
+    { name: 'convert1s', ms: 12000, run: () => resolveConvert1s(vid, quality, onProgress) },
+  ];
 
-  // Prioritas 3: Convert1s (Mori engine) - resolusi MP3 tercepat
-  try {
-    const audioUrl = await resolveConvert1s(vid, quality, onProgress);
-    if (audioUrl) {
-      console.log(`[YouTube Music] Berhasil resolve Convert1s dalam ${Date.now() - startTime}ms`);
-      return audioUrl;
-    }
-  } catch (err) {
-    console.warn('[YouTube Music] Convert1s gagal, fallback:', err?.message || err);
-  }
+  let lastError = null;
+  for (const layer of layers) {
+    if (layer.when && !layer.when()) continue;
+    if (isLayerBlocked(layer.name)) continue;
 
-  // Prioritas 4: Remote yt-dlp (di server Arloader)
-  try {
-    const audioUrl = await resolveYtDlpRemote(vid, quality, onProgress);
-    if (audioUrl) {
-      console.log(`[YouTube Music] Berhasil resolve yt-dlp remote dalam ${Date.now() - startTime}ms`);
-      return audioUrl;
-    }
-  } catch (err) {
-    console.warn('[YouTube Music] yt-dlp remote gagal, fallback:', err?.message || err);
-  }
-
-  // Prioritas 5: yt-dlp lokal (Vite dev mode)
-  if (isLocalWeb()) {
+    const t0 = Date.now();
     try {
-      const audioUrl = await resolveYtDlpLocal(vid, quality, onProgress);
-      if (audioUrl) {
-        console.log(`[YouTube Music] Berhasil resolve yt-dlp lokal dalam ${Date.now() - startTime}ms`);
+      const audioUrl = await withTimeout(layer.run(), layer.ms, layer.name);
+      if (audioUrl && String(audioUrl).startsWith('http')) {
+        markLayerOk(layer.name);
+        cacheSet(vid, audioUrl);
+        console.log(`[ArMusic] ${layer.name} berhasil dalam ${Date.now() - t0}ms`);
         return audioUrl;
       }
+      markLayerFailed(layer.name, 'tidak mengembalikan URL');
+      lastError = new Error(`${layer.name}: tidak mengembalikan URL`);
     } catch (err) {
-      console.warn('[YouTube Music] yt-dlp lokal gagal, fallback:', err?.message || err);
+      const msg = err?.message || String(err);
+      lastError = err instanceof Error ? err : new Error(msg);
+      if (/tidak dikonfigurasi/i.test(msg)) {
+        console.warn(`[ArMusic] ${layer.name} belum dikonfigurasi`);
+      } else {
+        markLayerFailed(layer.name, msg);
+      }
     }
   }
 
-  // Prioritas 6: Cari videoId dari kueri dan gunakan all-in-one resolver (existing)
-  try {
-    const audioUrl = await resolveYouTubeMusicAllInOne(vid, query, onProgress);
-    if (audioUrl) {
-      console.log(`[YouTube Music] Berhasil resolve all-in-one dalam ${Date.now() - startTime}ms`);
-      return audioUrl;
-    }
-  } catch (err) {
-    console.warn('[YouTube Music] all-in-one resolve gagal:', err?.message || err);
-  }
-
-  throw new Error('Semua layer resolusi audio gagal untuk YouTube Music.');
+  const hint = serverUrl
+    ? 'Server yt-dlp tidak merespons. Periksa apakah server masih jalan dan bisa dijangkau dari HP.'
+    : 'Belum ada server yt-dlp yang diatur. Buka Pengaturan -> URL yt-dlp server, lalu isi alamat server yt-dlp kamu.';
+  throw new Error(
+    `Tidak bisa memutar lagu ini. ${hint}${lastError ? ` (${lastError.message})` : ''}`,
+  );
 }
 
 async function resolveInnertubeStream(videoId, onProgress) {

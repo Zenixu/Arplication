@@ -59,6 +59,67 @@ function runYtDlp(args) {
   });
 }
 
+function runYtDlpCapture(args) {
+  return new Promise((resolveRun, rejectRun) => {
+    const child = spawn('yt-dlp', args, { stdio: ['ignore', 'pipe', 'pipe'] });
+    let stdout = '';
+    let errorOutput = '';
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk;
+      if (stdout.length > 8_000_000) stdout = stdout.slice(-8_000_000);
+    });
+    child.stderr.on('data', (chunk) => {
+      errorOutput = `${errorOutput}${chunk}`.slice(-MAX_ERROR_LENGTH);
+    });
+    child.once('error', rejectRun);
+    child.once('close', (code) => {
+      if (code === 0) resolveRun(stdout);
+      else rejectRun(new Error(errorOutput.trim() || `yt-dlp berhenti dengan kode ${code}.`));
+    });
+  });
+}
+
+/**
+ * Pencarian lewat yt-dlp (ytsearchN). Dipakai sebagai cadangan karena
+ * Innertube/Piped publik sering mati — lihat musicStream.js.
+ */
+async function search(requestUrl, response) {
+  const query = (requestUrl.searchParams.get('q') || '').trim();
+  const rawLimit = Number.parseInt(requestUrl.searchParams.get('limit') || '20', 10);
+  const limit = Math.min(Math.max(Number.isFinite(rawLimit) ? rawLimit : 20, 1), 40);
+
+  if (!query) {
+    sendJson(response, 400, { error: 'Parameter q wajib diisi.' });
+    return;
+  }
+
+  const raw = await runYtDlpCapture([
+    `ytsearch${limit}:${query}`,
+    '--flat-playlist',
+    '--dump-single-json',
+    '--skip-download',
+    '--no-warnings',
+  ]);
+
+  const data = JSON.parse(raw);
+  const entries = Array.isArray(data?.entries) ? data.entries : [];
+  const results = entries
+    .filter((entry) => entry && entry.id)
+    .map((entry) => ({
+      videoId: String(entry.id),
+      title: entry.title || 'Tanpa Judul',
+      artist: entry.uploader || entry.channel || entry.artist || 'YouTube',
+      duration: Number(entry.duration) || 0,
+      cover: entry.thumbnail
+        || (Array.isArray(entry.thumbnails) && entry.thumbnails.length
+          ? entry.thumbnails[entry.thumbnails.length - 1].url
+          : `https://i.ytimg.com/vi/${entry.id}/hqdefault.jpg`),
+    }));
+
+  sendJson(response, 200, { ok: true, results });
+}
+
 async function download(requestUrl, response) {
   const sourceUrl = requestUrl.searchParams.get('url') || '';
   const query = requestUrl.searchParams.get('query') || '';
@@ -220,6 +281,18 @@ export function createDownloaderServer() {
     const pathname = requestUrl.pathname.replace(/^\/api\/yt-dlp/, '');
     if (request.method === 'GET' && pathname === '/health') {
       sendJson(response, 200, { ok: true, service: 'arplication-yt-dlp' });
+      return;
+    }
+    if (request.method === 'GET' && pathname === '/search') {
+      try {
+        await search(requestUrl, response);
+      } catch (error) {
+        if (!response.headersSent) {
+          sendJson(response, 502, { error: error.message || 'Gagal mencari lewat yt-dlp.' });
+        } else {
+          response.destroy(error);
+        }
+      }
       return;
     }
     if (request.method === 'GET' && pathname === '/playlist-inspect') {

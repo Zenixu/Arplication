@@ -1,4 +1,4 @@
-import { httpClient, isLocalWeb } from '../http.js';
+import { httpClient, isLocalWeb, isNative } from '../http.js';
 import { PIPED_API_INSTANCES, pipedGet, pipedSearchVideos, pipedGetStreams, pickPipedAudioUrl, isBotBlockError, formatResolverError } from './youtube.js';
 
 /**
@@ -172,6 +172,60 @@ function formatDuration(seconds) {
 }
 
 /**
+ * Basis URL server yt-dlp: server rumah (native) atau proxy dev (web lokal).
+ */
+function ytDlpSearchBases() {
+  const bases = [];
+  try {
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem('arloader_settings') : null;
+    const settings = raw ? JSON.parse(raw) : {};
+    const server = String(settings.ytDlpServerUrl || '').trim().replace(/\/+$/, '');
+    if (isNative() && server) bases.push(server);
+  } catch {
+    /* abaikan */
+  }
+  if (isLocalWeb()) bases.push('/api/yt-dlp');
+  return bases;
+}
+
+/**
+ * Pencarian cadangan lewat yt-dlp. Innertube/Piped publik sering mati,
+ * sedangkan yt-dlp di server sendiri tetap jalan.
+ */
+async function searchViaYtDlp(query, limit) {
+  const bases = ytDlpSearchBases();
+  if (!bases.length) return [];
+
+  let lastError = null;
+  for (const base of bases) {
+    try {
+      const res = await httpClient({
+        url: `${base}/search?q=${encodeURIComponent(query)}&limit=${limit}`,
+        timeout: 30000,
+      });
+      const list = Array.isArray(res?.results) ? res.results : [];
+      if (list.length) {
+        return list.map((r) => ({
+          videoId: r.videoId,
+          title: r.title,
+          artist: r.artist,
+          duration: r.duration,
+          durationFormatted: r.duration ? formatDuration(r.duration) : null,
+          cover: r.cover,
+          platform: 'youtube_music',
+          source: 'ytdlp',
+        }));
+      }
+    } catch (err) {
+      lastError = err;
+      console.warn('[YouTube Music] pencarian yt-dlp gagal:', base, err?.message || err);
+    }
+  }
+  if (lastError) throw lastError;
+  return [];
+}
+
+/**
  * Search YouTube Music via Innertube API
  * Returns array of tracks: [{ videoId, title, artist, duration, cover, platform }]
  */
@@ -189,7 +243,7 @@ export async function searchYouTubeMusic(query = '', limit = 20) {
         method: 'POST',
         headers: BASE_HEADERS,
         data: body,
-        timeout: 15000,
+        timeout: 6000,
       });
 
       if (!data?.contents) {
@@ -242,27 +296,39 @@ export async function searchYouTubeMusic(query = '', limit = 20) {
     }
   }
 
-  // Fallback: Piped search (already has music filter capability)
+  // Fallback 1: Piped search
   console.warn('[YouTube Music] Innertube gagal, fallback ke Piped...');
   try {
     const pipedResults = await pipedSearchVideos(q, limit);
-    return pipedResults.map(r => ({
-      videoId: r.videoId,
-      title: r.title,
-      artist: r.uploader,
-      duration: r.duration,
-      durationFormatted: r.duration ? formatDuration(r.duration) : null,
-      cover: r.cover,
-      platform: 'youtube_music',
-      source: 'piped',
-    }));
-  } catch (pipedErr) {
-    const errText = String(lastError?.message || lastError || '');
-    if (/unable to resolve host|no address|eai_again|enotfound|dns/i.test(errText)) {
-      throw new Error('Server YouTube Music/Piped sedang offline atau gangguan jaringan.');
+    if (pipedResults?.length) {
+      return pipedResults.map((r) => ({
+        videoId: r.videoId,
+        title: r.title,
+        artist: r.uploader,
+        duration: r.duration,
+        durationFormatted: r.duration ? formatDuration(r.duration) : null,
+        cover: r.cover,
+        platform: 'youtube_music',
+        source: 'piped',
+      }));
     }
-    throw lastError || pipedErr || new Error('Semua metode pencarian YouTube Music gagal.');
+  } catch (pipedErr) {
+    console.warn('[YouTube Music] Piped gagal:', pipedErr?.message || pipedErr);
   }
+
+  // Fallback 2: yt-dlp (server rumah / proxy dev) — jalur paling andal sekarang
+  try {
+    const ytDlpResults = await searchViaYtDlp(q, limit);
+    if (ytDlpResults.length) return ytDlpResults;
+  } catch (ytErr) {
+    lastError = ytErr;
+  }
+
+  const errText = String(lastError?.message || lastError || '');
+  if (/unable to resolve host|no address|eai_again|enotfound|dns/i.test(errText)) {
+    throw new Error('Server YouTube Music/Piped sedang offline atau gangguan jaringan.');
+  }
+  throw lastError || new Error('Semua metode pencarian YouTube Music gagal. Atur URL server yt-dlp di Pengaturan untuk pencarian cadangan.');
 }
 
 /**

@@ -7,6 +7,40 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.3] - 2026-11-02
+
+# v1.9.3 — Pemutaran jalan lagi
+
+## Perbaikan
+- **Rantai sumber audio diurutkan ulang.** yt-dlp sekarang lapis pertama, bukan
+  lapis keempat. Sebelumnya Innertube (404), Piped (500), dan Convert1s (451)
+  semuanya mati, sehingga pengguna menunggu 60-90 detik sebelum sampai ke lapis
+  yang hidup — atau gagal sama sekali.
+- **Timeout per lapis dipendekkan** (6-12 detik untuk lapis lama), jadi lapis mati
+  tidak lagi menyandera pemutaran.
+- **Circuit breaker 24 jam.** Lapis yang gagal dilewati selama 24 jam dan dicoba
+  lagi otomatis, bukan diulang setiap kali lagu diputar.
+- **Cache URL audio 90 menit.** Lagu yang sudah pernah di-resolve langsung bunyi
+  tanpa resolve ulang (URL asli berlaku ~6 jam).
+- **Pesan galat yang jelas.** Kalau server yt-dlp belum diatur, pesannya menyebut
+  apa yang harus dilakukan, bukan "semua lapis gagal".
+
+## Baru
+- **Pencarian cadangan lewat yt-dlp.** `downloader-server.js` kini punya endpoint
+  `/search` (yt-dlp `ytsearchN`), dan pencarian YouTube Music memakainya saat
+  Innertube/Piped mati. Pencarian kembali berfungsi.
+- **Mini player & Now Playing muncul untuk lagu hasil pencarian.** Sebelumnya
+  pemutar hanya mengenali lagu yang ada di library; lagu dari YouTube Music
+  berbunyi tanpa bisa dikontrol.
+
+## Keamanan
+- Kredensial signing tidak lagi disimpan di repo (dibaca dari `android/local.properties`
+  atau environment variable). Password keystore diputar; sertifikat APK tidak berubah.
+
+## Catatan
+- Untuk memutar lagu YouTube, isi **Pengaturan -> URL yt-dlp server** dengan alamat
+  server `scripts/downloader-server.js` kamu (mis. `http://100.x.x.x:8787` lewat Tailscale).
+
 ## [1.9.2] - 2026-11-02
 
 # v1.9.2 — ArMusic: tampilan baru

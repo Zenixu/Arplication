@@ -119,6 +119,7 @@ export default function ArMusicModule({ setActiveTab }) {
   const [editingName, setEditingName] = useState('');
   const [addToPickTrack, setAddToPickTrack] = useState(null); // track yg mau dimasukkan playlist
   const [groupOpen, setGroupOpen] = useState({}); // artis/folder collapsible: { key: true }
+  const [nowPlayingTrack, setNowPlayingTrack] = useState(null); // track aktif (bisa dari pencarian, bukan hanya library)
   const [showEq, setShowEq] = useState(false);
   const [eqInfo, setEqInfo] = useState(null);
   const [eqLoading, setEqLoading] = useState(false);
@@ -180,7 +181,9 @@ export default function ArMusicModule({ setActiveTab }) {
   const toggleShuffleRef = useRef(null);
 
   const filtered = filterTracks(tracks, query);
-  const current = tracks.find((t) => t.id === currentId) || null;
+  const current = (nowPlayingTrack && nowPlayingTrack.id === currentId)
+    ? nowPlayingTrack
+    : (tracks.find((t) => t.id === currentId) || null);
 
   const persist = (next) => {
     setTracks(next);
@@ -267,6 +270,7 @@ export default function ArMusicModule({ setActiveTab }) {
       if (id && id !== currentIdRef.current) {
         currentIdRef.current = id;
         setCurrentId(id);
+        if (q[s.index] && typeof q[s.index] === 'object') setNowPlayingTrack(q[s.index]);
         setElapsed(0);
       }
     }
@@ -288,6 +292,7 @@ export default function ArMusicModule({ setActiveTab }) {
         setElapsed(0);
         setDuration(track.durationSec || 0);
       }
+      setNowPlayingTrack(track);
       await audio.play();
       setPlaying(true);
       syncMetaFor(track, true);
@@ -348,6 +353,7 @@ export default function ArMusicModule({ setActiveTab }) {
       effectiveQueueRef.current = ordered;
       currentIdRef.current = track.id;
       setCurrentId(track.id);
+      setNowPlayingTrack(track);
       setElapsed(0);
       setDuration(track.durationSec || 0);
       setPlaying(true);
