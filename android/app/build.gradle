@@ -16,17 +16,39 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Kredensial signing TIDAK disimpan di repo (repo ini publik).
+    // Sumber: android/local.properties (gitignored) atau environment variable.
+    // Tanpa kredensial, build release tetap jalan tetapi tidak ditandatangani.
+    def signingProps = new Properties()
+    def signingPropsFile = rootProject.file('local.properties')
+    if (signingPropsFile.exists()) {
+        signingPropsFile.withInputStream { signingProps.load(it) }
+    }
+    def ksFile = System.getenv('ARPLICATION_STORE_FILE') ?: signingProps.getProperty('arplication.storeFile')
+    def ksStorePassword = System.getenv('ARPLICATION_STORE_PASSWORD') ?: signingProps.getProperty('arplication.storePassword')
+    def ksKeyAlias = System.getenv('ARPLICATION_KEY_ALIAS') ?: signingProps.getProperty('arplication.keyAlias')
+    def ksKeyPassword = System.getenv('ARPLICATION_KEY_PASSWORD') ?: signingProps.getProperty('arplication.keyPassword')
+    def canSign = ksFile && ksStorePassword && ksKeyAlias && ksKeyPassword && file(ksFile).exists()
+
+    if (!canSign) {
+        logger.lifecycle('Arplication: kredensial signing tidak ditemukan — APK release akan TIDAK ditandatangani.')
+    }
+
     signingConfigs {
         release {
-            storeFile file('../arplication-release.keystore')
-            storePassword 'arplication123'
-            keyAlias 'arplication'
-            keyPassword 'arplication123'
+            if (canSign) {
+                storeFile file(ksFile)
+                storePassword ksStorePassword
+                keyAlias ksKeyAlias
+                keyPassword ksKeyPassword
+            }
         }
     }
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            if (canSign) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

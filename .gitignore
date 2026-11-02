@@ -37,7 +37,8 @@ android/local.properties
 android/app/release/
 *.apk
 *.aab
-# Release keystore — JANGAN commit (kunci signing + password publik di build.gradle)
+# Release keystore — JANGAN commit. Kredensial dibaca dari android/local.properties
+# (gitignored) atau env ARPLICATION_STORE_FILE/STORE_PASSWORD/KEY_ALIAS/KEY_PASSWORD.
 android/arplication-release.keystore
 *.keystore
 *.jks
