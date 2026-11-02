@@ -23,7 +23,14 @@ function Artwork({ track, size = 'lg' }) {
   const cover = coverOf(track);
   const box = size === 'lg' ? 'w-full h-full' : 'w-12 h-12';
   if (cover) {
-    return <img src={cover} alt="" className={`${box} object-cover rounded-2xl border-[2.5px] border-[#121212] shadow-[4px_4px_0px_#121212]`} />;
+    return (
+      <img
+        src={cover}
+        alt=""
+        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+        className={`${box} object-cover rounded-2xl border-[2.5px] border-[#121212] shadow-[4px_4px_0px_#121212]`}
+      />
+    );
   }
   const initial = (track?.title || '?').trim().charAt(0).toUpperCase();
   return (

@@ -2,6 +2,8 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
 import { isNative } from './http.js';
 
+import { getDownloadHistory } from '../utils/history.js';
+
 export const ARMUSIC_LIBRARY_KEY = 'armusic_library';
 export const MAX_LIBRARY_ITEMS = 500;
 
@@ -84,12 +86,39 @@ function writeLibrary(items = []) {
   }
 }
 
+/**
+ * Peta nama file → URL cover, diambil dari riwayat unduhan Arloader.
+ * Lagu hasil unduhan tidak menyimpan cover di dalam file audio, jadi cover
+ * dicocokkan lewat nama file yang sama.
+ */
+export function buildCoverMap() {
+  const map = new Map();
+  try {
+    for (const rec of getDownloadHistory()) {
+      if (rec && rec.filename && rec.cover) map.set(rec.filename, rec.cover);
+    }
+  } catch {
+    /* riwayat tidak terbaca — biarkan kosong */
+  }
+  return map;
+}
+
+/** Lengkapi `cover` pada track yang belum punya, berdasarkan riwayat unduhan. */
+export function attachCovers(tracks = []) {
+  const map = buildCoverMap();
+  if (!map.size) return tracks;
+  return tracks.map((t) =>
+    t && !t.cover && t.filename && map.has(t.filename) ? { ...t, cover: map.get(t.filename) } : t,
+  );
+}
+
 export function loadLibrary() {
   // Entri hasil file-picker (blob:) mati setelah reload — tandai agar user pilih ulang.
-  return readLibrary().map((t) => ({
+  const items = readLibrary().map((t) => ({
     ...t,
     unavailable: t.source === 'pick' && String(t.uri || '').startsWith('blob:'),
   }));
+  return attachCovers(items);
 }
 
 export function saveLibrary(tracks = []) {
@@ -103,7 +132,7 @@ export function addOrUpdateTrackInLibrary(track) {
   const current = loadLibrary();
   const byId = new Map(current.map((t) => [t.id, t]));
   byId.set(track.id, { ...(byId.get(track.id) || {}), ...track, unavailable: false });
-  const updated = [...byId.values()].slice(0, MAX_LIBRARY_ITEMS);
+  const updated = attachCovers([...byId.values()].slice(0, MAX_LIBRARY_ITEMS));
   saveLibrary(updated);
   return updated;
 }
@@ -203,5 +232,5 @@ export function mergeScanResults(library = [], scanned = []) {
   for (const track of scanned) {
     byId.set(track.id, { ...byId.get(track.id), ...track, unavailable: false });
   }
-  return [...byId.values()].slice(0, MAX_LIBRARY_ITEMS);
+  return attachCovers([...byId.values()].slice(0, MAX_LIBRARY_ITEMS));
 }

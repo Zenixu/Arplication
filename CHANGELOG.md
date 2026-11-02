@@ -7,6 +7,33 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.18] - 2026-11-02
+
+# v1.9.18 — Cover lagu di ArMusic
+
+## Perbaikan
+- **Lagu hasil unduhan sekarang punya cover.** Sebelumnya ArMusic hanya
+  menampilkan kotak warna dengan ikon musik. Ternyata UI-nya sudah mendukung
+  cover (`coverOf(track)`) — yang kurang hanya datanya: entri perpustakaan
+  tidak pernah menyimpan `cover`.
+- Cover diambil dari **riwayat unduhan Arloader**, dicocokkan lewat nama file
+  yang sama (`attachCovers()` di `localMusic.js`). Dipasang di `loadLibrary`,
+  `mergeScanResults`, dan `addOrUpdateTrackInLibrary`, jadi lagu lama maupun
+  hasil pindai baru langsung dapat cover.
+- **Gagal muat = sembunyi, bukan ikon rusak.** Kalau tautan cover tidak bisa
+  dibuka (mis. offline), gambarnya disembunyikan sehingga warna latar kartu
+  yang tampil.
+
+## Batasan yang diketahui
+Cover masih berupa tautan internet (`i.ytimg.com`). Saat offline gambarnya tidak
+muncul. Perbaikan sebenarnya — menyimpan thumbnail ke file saat unduhan selesai —
+dicatat sebagai **A7b** di TODO.
+
+## Verifikasi
+- Lagu dengan nama file yang cocok: cover muncul dan termuat (`naturalWidth > 0`).
+- Lagu tanpa riwayat unduhan: tetap kotak warna seperti sebelumnya.
+- Cover dengan URL rusak: gambar `display: none`, tidak ada ikon gambar rusak.
+
 ## [1.9.17] - 2026-11-02
 
 # v1.9.17 — Kartu homescreen menampilkan keadaan sebenarnya

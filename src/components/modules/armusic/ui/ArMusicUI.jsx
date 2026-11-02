@@ -33,6 +33,13 @@ function coverOf(t) {
   return t?.cover || t?.thumbnail || t?.artwork || null;
 }
 
+// Cover bisa berupa tautan internet (mis. i.ytimg.com). Kalau gagal dimuat —
+// misalnya sedang offline — sembunyikan gambarnya supaya warna latar kartu
+// yang tampil, bukan ikon gambar rusak.
+const hideOnError = (e) => {
+  e.currentTarget.style.display = 'none';
+};
+
 /* ---------------------------------------------------------------- primitives */
 
 function Sheet({ title, onClose, children }) {
@@ -67,7 +74,7 @@ function TrackRow({ track, active, playing, onPlay, onAdd, onRemove, durationLab
         style={{ background: active ? '#121212' : accentFor(track.title) }}
       >
         {coverOf(track) ? (
-          <img src={coverOf(track)} alt="" className="w-full h-full object-cover" />
+          <img src={coverOf(track)} alt="" className="w-full h-full object-cover" onError={hideOnError} />
         ) : active && playing ? (
           <Pause className="w-4 h-4 text-[#FFE600]" />
         ) : (
@@ -118,7 +125,7 @@ function MiniPlayer({ track, playing, elapsed, duration, onToggle, onNext, onOpe
           <div className="flex items-center gap-2 p-1.5">
             <button onClick={onOpen} className="flex items-center gap-2 flex-1 min-w-0 text-left">
               <div className="w-9 h-9 rounded-lg border-2 border-[#121212] overflow-hidden shrink-0 flex items-center justify-center" style={{ background: accentFor(track.title) }}>
-                {coverOf(track) ? <img src={coverOf(track)} alt="" className="w-full h-full object-cover" /> : <Music2 className="w-4 h-4" />}
+                {coverOf(track) ? <img src={coverOf(track)} alt="" className="w-full h-full object-cover" onError={hideOnError} /> : <Music2 className="w-4 h-4" />}
               </div>
               <div className="min-w-0">
                 <p className="text-[11px] font-black truncate leading-tight">{track.title}</p>
@@ -225,7 +232,7 @@ export default function ArMusicUI(props) {
           <p className="text-[11px] font-mono-code font-black uppercase tracking-widest text-[#FFE600]/80 mb-2">Lanjutkan mendengarkan</p>
           <div className="flex items-center gap-3">
             <button onClick={() => setNpOpen(true)} className="w-14 h-14 rounded-xl border-2 border-white/20 overflow-hidden shrink-0 flex items-center justify-center" style={{ background: accentFor(current.title) }}>
-              {coverOf(current) ? <img src={coverOf(current)} alt="" className="w-full h-full object-cover" /> : <Music2 className="w-6 h-6" />}
+              {coverOf(current) ? <img src={coverOf(current)} alt="" className="w-full h-full object-cover" onError={hideOnError} /> : <Music2 className="w-6 h-6" />}
             </button>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-black text-white truncate">{current.title}</p>

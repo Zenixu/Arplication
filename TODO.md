@@ -48,8 +48,14 @@ Satu item = satu perubahan yang bisa dirilis sendiri.
       diputar. ARDORO: sisa waktu timer ("11:43 · fokus") atau "Jeda · mm:ss".
       Artoolbox tetap statis karena isinya memang daftar alat.
 
-- [ ] **A7 · `P2` · `M` · Cover art untuk lagu di ArMusic.**
-      Sekarang kotak warna kosong. Ambil dari thumbnail hasil unduhan.
+- [x] **A7 · `P2` · `M` · Cover art untuk lagu di ArMusic.** — **selesai di v1.9.18**
+      Cover diambil dari riwayat unduhan Arloader (dicocokkan lewat nama file).
+      Kalau gambar gagal dimuat, gambar disembunyikan dan warna kartu yang tampil.
+
+- [ ] **A7b · `P2` · `M` · Cover masih berupa tautan internet.**
+      Thumbnail diambil dari `i.ytimg.com`, jadi **hilang saat offline** — padahal
+      tema aplikasi offline-first. Perlu disimpan ke file saat unduhan selesai
+      (fetch → tulis ke `Aruthtale/Covers/`) lalu simpan path-nya di riwayat.
 
 - [ ] **A8 · `P2` · `S` · Kontras teks abu terlalu tipis.**
       Banyak `text-[#121212]/45`; naikkan ke `/60` agar terbaca di layar redup.
