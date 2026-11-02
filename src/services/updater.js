@@ -2,7 +2,7 @@ import { httpClient, isNative } from './http.js';
 import { downloadMedia } from '../utils/download.js';
 import { openApkInstaller } from './apkInstaller.js';
 
-export const APP_VERSION = '1.9.16';
+export const APP_VERSION = '1.9.17';
 export const GITHUB_REPO = 'Aruthtale/Arplication';
 export const GITHUB_RELEASES_API = `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`;
 export const GITHUB_RAW_PACKAGE = `https://raw.githubusercontent.com/${GITHUB_REPO}/main/package.json`;
