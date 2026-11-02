@@ -7,6 +7,31 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.13] - 2026-11-02
+
+# v1.9.13 — Bottom nav rata & label tidak terpotong
+
+## Perbaikan
+- **Kelima item bottom nav sekarang selebar sama.** Sebelumnya memakai
+  `justify-around` sehingga lebar tombol mengikuti panjang label ("Hub" vs
+  "Arloader") dan celahnya tidak rata. Sekarang tiap tombol `flex-1`:
+  **66px** di layar 360, **72px** di 390, **86px** di desktop — sama semua.
+- **Titik hijau di tab ARLOADER dihapus.** Titik itu statis (badge `'Active'`)
+  dan tidak pernah hilang walau menu sudah dibuka — lama-lama pengguna terbiasa
+  mengabaikan tanda notifikasi.
+
+## Ikut diperbaiki
+- **Nama kartu ALAT tidak terpotong lagi di layar kecil.** Di 360px,
+  "ARTOOLBOX" sempat jadi "ARTOOLB…" setelah teks diperbesar di v1.9.11.
+  Padding horizontal kartu tinggi dikurangi dan ukuran nama disesuaikan
+  (10px di HP, 11px di layar lebar).
+- **Keterangan di kartu tinggi (Ardoro, Artoolbox) dinaikkan dari 7,5px ke 10px**
+  — sebelumnya terlewat dari perbaikan ukuran teks di v1.9.11.
+
+## Verifikasi
+Diperiksa di 360px, 390px, dan 1024px: **tidak ada** teks yang terpotong, dan
+kelima item nav berukuran identik.
+
 ## [1.9.12] - 2026-11-02
 
 # v1.9.12 — Kartu "Pipeline Status" dihapus

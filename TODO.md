@@ -31,7 +31,7 @@ Satu item = satu perubahan yang bisa dirilis sendiri.
       Isinya `0 DONE / IDLE` dan `SANDBOX 100%` — istilah teknis yang tidak
       menjelaskan apa pun ke pengguna. Ganti jadi ringkasan berguna atau hapus.
 
-- [ ] **A3 · `P0` · `S` · Bottom nav tidak rata.**
+- [x] **A3 · `P0` · `S` · Bottom nav tidak rata.** — **selesai di v1.9.13**
       Celah antara ARMAPS dan TOOLBOX lebih lebar dari yang lain karena kotak
       HUB lebih besar. Samakan lebar tiap item.
 

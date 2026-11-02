@@ -258,8 +258,8 @@ export default function HomeHub({ setActiveTab }) {
                 mod.layout === 'wide'
                   ? 'p-1 flex items-center gap-2 text-left'
                   : mod.layout === 'tall'
-                    ? 'p-1.5 flex flex-col items-center gap-1 text-center'
-                    : 'p-1.5 flex flex-col items-center justify-center gap-1 text-center'
+                    ? 'px-1 py-1.5 flex flex-col items-center gap-1 text-center'
+                    : 'p-1 flex flex-col items-center justify-center gap-1 text-center'
               }`}
             >
               {/* logo */}
@@ -288,11 +288,11 @@ export default function HomeHub({ setActiveTab }) {
                 </span>
               ) : (
                 <span className="block w-full min-w-0">
-                  <span className="block text-[11px] md:text-[10px] font-black uppercase tracking-tight leading-tight truncate">
+                  <span className="block text-[10px] md:text-[11px] font-black uppercase tracking-tight leading-tight truncate">
                     {mod.short}
                   </span>
                   {mod.layout === 'tall' && (
-                    <span className="block text-[7.5px] font-mono-code font-bold text-[#121212]/45 leading-tight mt-0.5">
+                    <span className="block text-[10px] font-mono-code font-bold text-[#121212]/45 leading-tight mt-0.5">
                       {mod.info}
                     </span>
                   )}
