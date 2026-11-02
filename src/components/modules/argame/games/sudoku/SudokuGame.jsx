@@ -386,7 +386,7 @@ export default function SudokuGame({ onBack, soundEnabled, hapticEnabled, onNewS
                     <span className={textClass}>{val}</span>
                   ) : notes[r]?.[c]?.size > 0 ? (
                     /* Display Pencil Notes 3x3 Grid */
-                    <div className="grid grid-cols-3 gap-[1px] w-full h-full p-0.5 pointer-events-none text-[8px] font-mono-code leading-none text-gray-500 font-bold items-center justify-items-center">
+                    <div className="grid grid-cols-3 gap-[1px] w-full h-full p-0.5 pointer-events-none text-[10px] font-mono-code leading-none text-gray-500 font-bold items-center justify-items-center">
                       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
                         <span key={n}>{notes[r][c].has(n) ? n : ''}</span>
                       ))}

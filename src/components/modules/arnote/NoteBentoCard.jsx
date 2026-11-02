@@ -100,14 +100,14 @@ export default function NoteBentoCard({ note, onEdit, onDelete, onTogglePin, onE
             {note.tags.slice(0, 2).map((tag, i) => (
               <span
                 key={i}
-                className="inline-flex items-center gap-0.5 text-[8.5px] sm:text-[9.5px] font-bold px-1.5 py-0.5 bg-[#121212] text-white rounded border border-[#121212] truncate max-w-[80px]"
+                className="inline-flex items-center gap-0.5 text-[10px] sm:text-[11px] font-bold px-1.5 py-0.5 bg-[#121212] text-white rounded border border-[#121212] truncate max-w-[80px]"
               >
                 <Tag className="w-2 h-2 shrink-0" />
                 <span className="truncate">{tag}</span>
               </span>
             ))}
             {note.tags.length > 2 && (
-              <span className="text-[8.5px] font-bold px-1 py-0.5 bg-black/10 rounded text-[#121212]">
+              <span className="text-[10px] font-bold px-1 py-0.5 bg-black/10 rounded text-[#121212]">
                 +{note.tags.length - 2}
               </span>
             )}
@@ -115,8 +115,8 @@ export default function NoteBentoCard({ note, onEdit, onDelete, onTogglePin, onE
         )}
 
         {/* Date and Action Controls */}
-        <div className="flex items-center justify-between text-[9.5px] sm:text-[10.5px] font-bold text-[#121212]/70">
-          <span className="font-mono text-[9px] sm:text-[10px]">{formatDate(note.updatedAt)}</span>
+        <div className="flex items-center justify-between text-[11px] sm:text-[10.5px] font-bold text-[#121212]/70">
+          <span className="font-mono text-[11px] sm:text-[10px]">{formatDate(note.updatedAt)}</span>
           <div className="flex items-center gap-1">
             <button
               type="button"

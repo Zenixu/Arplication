@@ -55,11 +55,11 @@ export default function DownloadHistory({ items, onChange, setActiveTab }) {
               {kindIcon(item.type, item.ext)}
             </div>
             <div className="flex-1 min-w-0">
-              <span className="text-[9px] font-mono-code font-black uppercase text-emerald-800 bg-[#38E54D]/30 px-1 rounded border border-black inline-block">
+              <span className="text-[11px] font-mono-code font-black uppercase text-emerald-800 bg-[#38E54D]/30 px-1 rounded border border-black inline-block">
                 {item.platform}
               </span>
               <p className="text-xs font-black text-[#121212] truncate mt-0.5">{item.filename || item.title}</p>
-              <span className="text-[9px] font-mono-code font-bold text-gray-500">
+              <span className="text-[11px] font-mono-code font-bold text-gray-500">
                 {new Date(item.timestamp).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' })}
               </span>
             </div>

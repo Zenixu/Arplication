@@ -613,13 +613,13 @@ export default function ArdoroModule({ setActiveTab }) {
             const h = Math.max(6, Math.round((d.minutes / max) * 64));
             return (
               <div key={d.key} className="flex-1 flex flex-col items-center gap-1">
-                <span className="text-[9px] font-mono-code font-black text-[#121212]">{d.minutes > 0 ? d.minutes : ''}</span>
+                <span className="text-[11px] font-mono-code font-black text-[#121212]">{d.minutes > 0 ? d.minutes : ''}</span>
                 <div
                   className={`w-full rounded-t-md border-2 border-[#121212] ${d.minutes > 0 ? 'bg-[#38E54D]' : 'bg-[#F1EFE9]'}`}
                   style={{ height: `${h}px` }}
                   title={`${d.label}: ${d.minutes} menit`}
                 />
-                <span className="text-[9px] font-mono-code font-bold text-gray-500 uppercase">{d.label}</span>
+                <span className="text-[11px] font-mono-code font-bold text-gray-500 uppercase">{d.label}</span>
               </div>
             );
           })}

@@ -122,7 +122,7 @@ function MiniPlayer({ track, playing, elapsed, duration, onToggle, onNext, onOpe
               </div>
               <div className="min-w-0">
                 <p className="text-[11px] font-black truncate leading-tight">{track.title}</p>
-                <p className="text-[9px] font-mono-code font-bold text-[#121212]/50 truncate">{track.artist}</p>
+                <p className="text-[11px] font-mono-code font-bold text-[#121212]/50 truncate">{track.artist}</p>
               </div>
             </button>
             <button onClick={onToggle} className="w-9 h-9 rounded-lg bg-[#121212] text-[#FFE600] flex items-center justify-center shrink-0" aria-label={playing ? 'Jeda' : 'Putar'}>
@@ -222,7 +222,7 @@ export default function ArMusicUI(props) {
     <div className="space-y-4">
       {current ? (
         <div className="p-3.5 bg-[#121212] rounded-2xl border-[2.5px] border-[#121212] shadow-[4px_4px_0_#38E54D]">
-          <p className="text-[9px] font-mono-code font-black uppercase tracking-widest text-[#FFE600]/80 mb-2">Lanjutkan mendengarkan</p>
+          <p className="text-[11px] font-mono-code font-black uppercase tracking-widest text-[#FFE600]/80 mb-2">Lanjutkan mendengarkan</p>
           <div className="flex items-center gap-3">
             <button onClick={() => setNpOpen(true)} className="w-14 h-14 rounded-xl border-2 border-white/20 overflow-hidden shrink-0 flex items-center justify-center" style={{ background: accentFor(current.title) }}>
               {coverOf(current) ? <img src={coverOf(current)} alt="" className="w-full h-full object-cover" /> : <Music2 className="w-6 h-6" />}
@@ -238,7 +238,7 @@ export default function ArMusicUI(props) {
         </div>
       ) : (
         <div className="p-4 bg-[#D8B4FE] rounded-2xl border-[2.5px] border-[#121212] shadow-[4px_4px_0_#121212]">
-          <p className="text-[9px] font-mono-code font-black uppercase tracking-widest text-[#121212]/50 mb-1">Belum ada lagu diputar</p>
+          <p className="text-[11px] font-mono-code font-black uppercase tracking-widest text-[#121212]/50 mb-1">Belum ada lagu diputar</p>
           <h2 className="text-lg font-black leading-tight mb-2">Mulai dari koleksi atau YouTube Music</h2>
           <div className="flex gap-2">
             <button onClick={handleScan} className="nb-btn px-3 py-2 bg-[#FFE600] text-[11px] font-mono-code uppercase flex items-center gap-1.5">
@@ -279,7 +279,7 @@ export default function ArMusicUI(props) {
                     <ListMusic className="w-6 h-6" />
                   </div>
                   <p className="text-[11px] font-black truncate leading-tight">{p.name}</p>
-                  <p className="text-[9px] font-mono-code font-bold text-[#121212]/50">{count} lagu</p>
+                  <p className="text-[11px] font-mono-code font-bold text-[#121212]/50">{count} lagu</p>
                 </button>
               );
             })}
@@ -528,7 +528,7 @@ export default function ArMusicUI(props) {
             </span>
             <div className="min-w-0">
               <p className="text-[11px] font-black uppercase leading-none truncate">ArMusic</p>
-              <p className="text-[8px] font-mono-code font-bold text-[#121212]/45 truncate">
+              <p className="text-[10px] font-mono-code font-bold text-[#121212]/45 truncate">
                 {tracks.length} lagu · {playlists.length} playlist
               </p>
             </div>
@@ -552,10 +552,10 @@ export default function ArMusicUI(props) {
             );
           })}
 
-          <p className="text-[8px] font-mono-code font-black text-[#121212]/40 px-2 pt-2">PLAYLIST</p>
+          <p className="text-[10px] font-mono-code font-black text-[#121212]/40 px-2 pt-2">PLAYLIST</p>
           <div className="flex-1 min-h-0 overflow-y-auto space-y-0.5 pr-0.5">
             {playlists.length === 0 ? (
-              <p className="text-[9px] font-mono-code font-bold text-[#121212]/35 px-2 py-1">Belum ada playlist</p>
+              <p className="text-[11px] font-mono-code font-bold text-[#121212]/35 px-2 py-1">Belum ada playlist</p>
             ) : (
               playlists.map((p) => (
                 <button
@@ -598,7 +598,7 @@ export default function ArMusicUI(props) {
               <h2 className="text-xs md:text-sm font-black uppercase tracking-tight leading-none">
                 {TABS.find((t) => t.id === tab)?.label || 'ArMusic'}
               </h2>
-              <span className="text-[9px] font-mono-code font-bold text-[#121212]/40">
+              <span className="text-[11px] font-mono-code font-bold text-[#121212]/40">
                 {tracks.length} lagu
               </span>
             </div>
@@ -829,7 +829,7 @@ export default function ArMusicUI(props) {
                   const min = eqInfo.minGainMb || -1500;
                   return (
                     <div key={freq} className="flex items-center gap-2">
-                      <span className="w-10 text-[9px] font-mono-code font-black text-[#121212]/50 shrink-0">
+                      <span className="w-10 text-[11px] font-mono-code font-black text-[#121212]/50 shrink-0">
                         {freq >= 1000 ? `${Math.round(freq / 1000)}k` : `${Math.round(freq)}`}
                       </span>
                       <input
@@ -842,7 +842,7 @@ export default function ArMusicUI(props) {
                         className="flex-1 accent-[#121212]"
                         aria-label={`Band ${i + 1}`}
                       />
-                      <span className="w-10 text-[9px] font-mono-code font-black text-right shrink-0">{Math.round(gain / 100)}</span>
+                      <span className="w-10 text-[11px] font-mono-code font-black text-right shrink-0">{Math.round(gain / 100)}</span>
                     </div>
                   );
                 })}

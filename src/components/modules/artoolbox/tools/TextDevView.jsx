@@ -236,7 +236,7 @@ export default function TextDevView({ onBack, onRefreshHistory }) {
             ].map((s) => (
               <div key={s.l} className="p-2.5 bg-white rounded-xl border-2 border-[#121212] shadow-[2px_2px_0px_#121212] text-center">
                 <div className="text-lg font-black text-[#121212] leading-none">{s.v}</div>
-                <div className="text-[9px] font-mono font-bold text-gray-600 uppercase mt-1">{s.l}</div>
+                <div className="text-[11px] font-mono font-bold text-gray-600 uppercase mt-1">{s.l}</div>
               </div>
             ))}
           </div>

@@ -372,11 +372,11 @@ export default function ImageStudioView({ onBack, onRefreshHistory }) {
 
                 <div className="grid grid-cols-2 gap-2 text-xs font-mono font-bold">
                   <div className="p-2.5 bg-white rounded-xl border border-[#121212]">
-                    <div className="text-gray-500 text-[9px]">UKURAN ASLI</div>
+                    <div className="text-gray-500 text-[11px]">UKURAN ASLI</div>
                     <div className="text-sm font-black">{formatBytes(originalFile?.size)}</div>
                   </div>
                   <div className="p-2.5 bg-white rounded-xl border border-[#121212]">
-                    <div className="text-gray-500 text-[9px]">UKURAN BARU</div>
+                    <div className="text-gray-500 text-[11px]">UKURAN BARU</div>
                     <div className="text-sm font-black text-green-700">{formatBytes(compressedSize)}</div>
                   </div>
                 </div>

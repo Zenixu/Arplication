@@ -256,7 +256,7 @@ export default function AppSettingsModal({ isOpen, onClose }) {
                 <KeyRound className="w-3.5 h-3.5 text-[#FF9F1C]" />
                 <div>
                   <div className="text-[11px] font-black text-[#121212]">Sertakan login</div>
-                  <div className="text-[9px] text-gray-500">Token YouTube Music (opsional)</div>
+                  <div className="text-[11px] text-gray-500">Token YouTube Music (opsional)</div>
                 </div>
               </div>
               <button

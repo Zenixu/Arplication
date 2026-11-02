@@ -7,6 +7,29 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.11] - 2026-11-02
+
+# v1.9.11 — Teks lebih mudah dibaca
+
+## Perbaikan
+- **Ukuran teks minimum dinaikkan.** Ada 87 elemen yang memakai 8–9,5px (setara
+  ±2,1 mm di layar HP — di bawah batas nyaman baca). Sekarang:
+  - 8px & 8,5px → **10px**
+  - 9px & 9,5px → **11px**
+  Perubahan berlaku di 21 file, termasuk kartu-kartu homescreen, tab ArMusic,
+  Arloader, dan label bottom nav.
+- **Kartu ARTOOLBOX tidak lagi terpotong** ("ARTOOLB…") setelah teks diperbesar —
+  padding kartu tinggi dikurangi 2px supaya nama muat.
+- **Deskripsi di kartu lebar (ARLOADER/ARMUSIC) boleh dua baris**, jadi tidak
+  terpotong jadi "Unduh video & a…".
+- **Kolom tempel link Arloader dirapikan.** Placeholder dipendekkan jadi
+  "Tempel tautan di sini…" dan tinggi kolom ditambah, karena teks panjang
+  sebelumnya terpotong di tepi bawah. Tombol utama ikut naik jadi 12,5px.
+
+## Verifikasi
+- Kelima tab (HUB, ARLOADER, ARMUSIC, ARMaps, TOOLBOX) diperiksa: **tidak ada**
+  teks yang meluap dari kotaknya.
+
 ## [1.9.10] - 2026-11-02
 
 # v1.9.10 — Arloader dirapikan

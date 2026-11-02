@@ -23,7 +23,7 @@ Satu item = satu perubahan yang bisa dirilis sendiri.
 
 ## A. Tampilan (dari yang paling harus dibenarkan)
 
-- [ ] **A1 · `P0` · `S` · Ukuran teks terlalu kecil.**
+- [x] **A1 · `P0` · `S` · Ukuran teks terlalu kecil.** — **selesai di v1.9.11**
       87 elemen memakai 8–9,5px. Naikkan minimum ke 11px, teks utama 13–14px.
       *Alasan:* di HP, 8px ≈ 2,1 mm — di bawah batas nyaman baca.
 

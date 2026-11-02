@@ -80,7 +80,7 @@ export default function DndPanel({ phase = 'focus', running = false }) {
           {state.active ? <BellOff className="w-4 h-4" /> : <BellRing className="w-4 h-4" />}
           Jangan Ganggu (Hening)
         </span>
-        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded border border-[#121212] ${
+        <span className={`text-[11px] font-black px-1.5 py-0.5 rounded border border-[#121212] ${
           !state.supported ? 'bg-white'
             : !state.granted ? 'bg-[#FFE600]'
             : state.active ? 'bg-[#38E54D]'
@@ -108,7 +108,7 @@ export default function DndPanel({ phase = 'focus', running = false }) {
           <div className="nb-card p-2.5 bg-white space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-black uppercase text-gray-600">Izin Akses Jangan Ganggu</span>
-              <span className={`text-[9px] font-black px-1.5 py-0.5 rounded border border-[#121212] ${
+              <span className={`text-[11px] font-black px-1.5 py-0.5 rounded border border-[#121212] ${
                 state.granted ? 'bg-[#38E54D]' : 'bg-[#FFE600]'
               }`}>
                 {state.granted ? 'SUDAH AKTIF' : 'BELUM AKTIF'}

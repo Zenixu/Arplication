@@ -103,7 +103,7 @@ export default function HomeHub({ setActiveTab }) {
     <div className="space-y-4 font-sans">
       {/* ============================ SEDANG BERJALAN ============================ */}
       <section className="space-y-2">
-        <h2 className="px-1 text-[9px] font-mono-code font-black uppercase tracking-widest text-[#121212]/45">
+        <h2 className="px-1 text-[11px] font-mono-code font-black uppercase tracking-widest text-[#121212]/45">
           Sedang berjalan
         </h2>
 
@@ -122,13 +122,13 @@ export default function HomeHub({ setActiveTab }) {
 
             <div className="flex-1 min-w-0">
               <p className="text-[11.5px] font-black text-white truncate leading-tight">{nowPlaying.title}</p>
-              <p className="text-[9px] font-mono-code font-bold text-white/55 truncate mt-0.5">
+              <p className="text-[11px] font-mono-code font-bold text-white/55 truncate mt-0.5">
                 {nowPlaying.artist || 'ArMusic'} · {nowPlaying.playing ? 'diputar' : 'dijeda'}
               </p>
               <div className="mt-1.5 h-1.5 rounded-full bg-white/20 overflow-hidden">
                 <div className="h-full bg-[#FFE600] rounded-full" style={{ width: `${progress}%` }} />
               </div>
-              <p className="mt-1 text-[8px] font-mono-code font-bold text-white/40">
+              <p className="mt-1 text-[10px] font-mono-code font-bold text-white/40">
                 {formatTime(nowPlaying.elapsed)} / {formatTime(nowPlaying.duration)}
               </p>
             </div>
@@ -147,7 +147,7 @@ export default function HomeHub({ setActiveTab }) {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[11px] font-black uppercase">Belum ada lagu diputar</p>
-              <p className="text-[9px] font-mono-code font-bold text-[#121212]/45">
+              <p className="text-[11px] font-mono-code font-bold text-[#121212]/45">
                 {libraryCount > 0 ? `${libraryCount} lagu siap diputar` : 'Tambahkan lagu lewat ArMusic'}
               </p>
             </div>
@@ -159,13 +159,13 @@ export default function HomeHub({ setActiveTab }) {
       {/* ============================ TERAKHIR DIPUTAR =========================== */}
       <section className="space-y-2">
         <div className="flex items-baseline justify-between px-1">
-          <h2 className="text-[9px] font-mono-code font-black uppercase tracking-widest text-[#121212]/45">
+          <h2 className="text-[11px] font-mono-code font-black uppercase tracking-widest text-[#121212]/45">
             Terakhir diputar
           </h2>
           {recent.length > 0 && (
             <button
               onClick={() => open('armusic')}
-              className="text-[9px] font-mono-code font-black uppercase text-[#121212]/45 hover:text-[#121212]"
+              className="text-[11px] font-mono-code font-black uppercase text-[#121212]/45 hover:text-[#121212]"
             >
               lihat semua →
             </button>
@@ -192,7 +192,7 @@ export default function HomeHub({ setActiveTab }) {
                   )}
                 </div>
                 <p className="text-[10px] font-black leading-tight truncate">{track.title}</p>
-                <p className="text-[8px] font-mono-code font-bold text-[#121212]/45 truncate">
+                <p className="text-[10px] font-mono-code font-bold text-[#121212]/45 truncate">
                   {track.artist || 'ArMusic'}
                 </p>
               </button>
@@ -203,7 +203,7 @@ export default function HomeHub({ setActiveTab }) {
 
       {/* ================================ AKTIVITAS =============================== */}
       <section className="space-y-2">
-        <h2 className="px-1 text-[9px] font-mono-code font-black uppercase tracking-widest text-[#121212]/45">
+        <h2 className="px-1 text-[11px] font-mono-code font-black uppercase tracking-widest text-[#121212]/45">
           Aktivitas
         </h2>
         <div className="grid grid-cols-2 gap-2.5">
@@ -213,10 +213,10 @@ export default function HomeHub({ setActiveTab }) {
           >
             <div className="flex items-center gap-1.5 mb-1">
               <Download className="w-3.5 h-3.5" />
-              <span className="text-[8px] font-mono-code font-black uppercase tracking-wider">Arloader</span>
+              <span className="text-[10px] font-mono-code font-black uppercase tracking-wider">Arloader</span>
             </div>
             <p className="text-2xl font-black leading-none">{downloads}</p>
-            <p className="text-[8.5px] font-mono-code font-bold text-[#121212]/60 mt-1">file terunduh</p>
+            <p className="text-[10px] font-mono-code font-bold text-[#121212]/60 mt-1">file terunduh</p>
           </button>
 
           <button
@@ -225,10 +225,10 @@ export default function HomeHub({ setActiveTab }) {
           >
             <div className="flex items-center gap-1.5 mb-1">
               <StickyNote className="w-3.5 h-3.5" />
-              <span className="text-[8px] font-mono-code font-black uppercase tracking-wider">Pin notes</span>
+              <span className="text-[10px] font-mono-code font-black uppercase tracking-wider">Pin notes</span>
             </div>
             <p className="text-2xl font-black leading-none">{pinnedNotes}</p>
-            <p className="text-[8.5px] font-mono-code font-bold text-[#121212]/60 mt-1">
+            <p className="text-[10px] font-mono-code font-bold text-[#121212]/60 mt-1">
               {noteCount > 0 ? `dari ${noteCount} catatan` : 'belum ada catatan'}
             </p>
           </button>
@@ -238,12 +238,12 @@ export default function HomeHub({ setActiveTab }) {
       {/* ================================== ALAT ================================= */}
       <section className="space-y-2">
         <div className="flex items-baseline justify-between px-1">
-          <h2 className="text-[9px] font-mono-code font-black uppercase tracking-widest text-[#121212]/45">
+          <h2 className="text-[11px] font-mono-code font-black uppercase tracking-widest text-[#121212]/45">
             Alat
           </h2>
           <button
             onClick={() => setShowAll((v) => !v)}
-            className="text-[9px] font-mono-code font-black uppercase text-[#121212]/45 hover:text-[#121212]"
+            className="text-[11px] font-mono-code font-black uppercase text-[#121212]/45 hover:text-[#121212]"
           >
             {showAll ? 'sembunyikan ↑' : 'lihat semua →'}
           </button>
@@ -258,7 +258,7 @@ export default function HomeHub({ setActiveTab }) {
                 mod.layout === 'wide'
                   ? 'p-1 flex items-center gap-2 text-left'
                   : mod.layout === 'tall'
-                    ? 'p-2 flex flex-col items-center gap-1 text-center'
+                    ? 'p-1.5 flex flex-col items-center gap-1 text-center'
                     : 'p-1.5 flex flex-col items-center justify-center gap-1 text-center'
               }`}
             >
@@ -282,13 +282,13 @@ export default function HomeHub({ setActiveTab }) {
                   <span className="block text-[10px] md:text-[11px] font-black uppercase tracking-tight leading-tight truncate">
                     {mod.short}
                   </span>
-                  <span className="block text-[8px] font-mono-code font-bold text-[#121212]/45 leading-tight truncate">
+                  <span className="block text-[10px] font-mono-code font-bold text-[#121212]/45 leading-tight line-clamp-2">
                     {mod.info}
                   </span>
                 </span>
               ) : (
                 <span className="block w-full min-w-0">
-                  <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-tight leading-tight truncate">
+                  <span className="block text-[11px] md:text-[10px] font-black uppercase tracking-tight leading-tight truncate">
                     {mod.short}
                   </span>
                   {mod.layout === 'tall' && (
@@ -319,7 +319,7 @@ export default function HomeHub({ setActiveTab }) {
                 </span>
                 <span className="flex-1 min-w-0">
                   <span className="block text-[10px] font-black uppercase truncate">{mod.title}</span>
-                  <span className="block text-[8px] font-mono-code font-bold text-[#121212]/45 truncate">{mod.info}</span>
+                  <span className="block text-[10px] font-mono-code font-bold text-[#121212]/45 truncate">{mod.info}</span>
                 </span>
                 <ChevronRight className="w-3.5 h-3.5 text-[#121212]/40 shrink-0" />
               </button>
@@ -328,7 +328,7 @@ export default function HomeHub({ setActiveTab }) {
         )}
       </section>
 
-      <p className="px-1 pb-1 text-[8px] font-mono-code font-bold text-[#121212]/30 flex items-center gap-1">
+      <p className="px-1 pb-1 text-[10px] font-mono-code font-bold text-[#121212]/30 flex items-center gap-1">
         <Layers className="w-3 h-3" />
         {libraryCount} lagu di koleksi · {downloads} unduhan tersimpan
       </p>

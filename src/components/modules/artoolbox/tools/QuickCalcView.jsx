@@ -44,7 +44,7 @@ function Result({ label, value, highlight }) {
         highlight ? 'bg-[#FFE600]' : 'bg-white'
       }`}
     >
-      <div className="text-[9px] font-mono font-bold text-gray-600 uppercase">{label}</div>
+      <div className="text-[11px] font-mono font-bold text-gray-600 uppercase">{label}</div>
       <div className="text-base font-black text-[#121212] break-all">{value}</div>
     </button>
   );

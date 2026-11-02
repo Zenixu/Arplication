@@ -161,11 +161,11 @@ export default function FocusLockPanel({ focusRunning = false, focusElapsedSec =
         </span>
         <span className="flex items-center gap-1.5">
           {config.strict && (
-            <span className="text-[9px] font-black px-1.5 py-0.5 rounded border border-[#121212] bg-[#C4FAF8] text-[#121212]">
+            <span className="text-[11px] font-black px-1.5 py-0.5 rounded border border-[#121212] bg-[#C4FAF8] text-[#121212]">
               KETAT
             </span>
           )}
-          <span className={`text-[9px] font-black px-1.5 py-0.5 rounded border border-[#121212] ${
+          <span className={`text-[11px] font-black px-1.5 py-0.5 rounded border border-[#121212] ${
             ready && config.enabled ? 'bg-[#FF525E] text-white' : 'bg-white text-[#121212]'
           }`}>
             {ready ? (config.enabled ? 'AKTIF' : 'SIAP') : 'PERLU IZIN'}
@@ -199,7 +199,7 @@ export default function FocusLockPanel({ focusRunning = false, focusElapsedSec =
               <X className="w-3.5 h-3.5" /> Batal (tetap fokus)
             </button>
           </div>
-          <p className="text-[9px] font-bold text-[#121212]/70 leading-snug">
+          <p className="text-[11px] font-bold text-[#121212]/70 leading-snug">
             Tombol akan aktif otomatis setelah hitungan selesai. Gunakan jeda ini untuk berpikir ulang.
           </p>
         </div>
@@ -310,7 +310,7 @@ export default function FocusLockPanel({ focusRunning = false, focusElapsedSec =
           <div className="nb-card p-3 bg-white space-y-2.5">
             <div className="flex items-center justify-between">
               <span className="text-[10px] font-black uppercase text-gray-600">4. Mode Ketat (Level 3)</span>
-              <span className={`text-[9px] font-black px-1.5 py-0.5 rounded border border-[#121212] ${
+              <span className={`text-[11px] font-black px-1.5 py-0.5 rounded border border-[#121212] ${
                 config.strict ? 'bg-[#C4FAF8]' : 'bg-white'
               }`}>
                 {strictLabel(config)}
@@ -416,10 +416,10 @@ export default function FocusLockPanel({ focusRunning = false, focusElapsedSec =
                     )}
                     <span className="flex-1 min-w-0">
                       <span className="block text-[11px] font-black text-[#121212] truncate">{app.label}</span>
-                      <span className="block text-[9px] font-mono-code text-gray-500 truncate">{app.packageName}</span>
+                      <span className="block text-[11px] font-mono-code text-gray-500 truncate">{app.packageName}</span>
                     </span>
                     {blocked && (
-                      <span className="text-[8px] font-black bg-[#FF525E] text-white px-1 py-0.5 rounded border border-[#121212] shrink-0">
+                      <span className="text-[10px] font-black bg-[#FF525E] text-white px-1 py-0.5 rounded border border-[#121212] shrink-0">
                         BLOKIR
                       </span>
                     )}

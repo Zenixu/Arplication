@@ -315,7 +315,7 @@ export default function MapViewerView({
           <h2 className="font-black text-sm uppercase tracking-tight truncate leading-tight">
             {region?.name || regionId}
           </h2>
-          <p className="text-[9.5px] font-mono-code font-bold text-gray-500 truncate">
+          <p className="text-[11px] font-mono-code font-bold text-gray-500 truncate">
             Data OSM {formatDataDate(MAPS_DATA_DATE)}
           </p>
         </div>
@@ -432,13 +432,13 @@ export default function MapViewerView({
               <span className="ml-1 font-mono-code">
                 {heading != null ? `${Math.round(heading)}°` : ''}
               </span>
-              <span className="ml-1 text-[9px] font-bold text-gray-600">
+              <span className="ml-1 text-[11px] font-bold text-gray-600">
                 {compassMode === 'heading' ? 'IKUT' : 'U↑'}
               </span>
             </button>
           )}
           {headingState === 'unsupported' && (
-            <div className="max-w-[150px] px-2 py-1 bg-[#FFFBDF] rounded-lg border-2 border-[#121212] text-[9px] font-bold text-gray-700 text-right">
+            <div className="max-w-[150px] px-2 py-1 bg-[#FFFBDF] rounded-lg border-2 border-[#121212] text-[11px] font-bold text-gray-700 text-right">
               Kompas tak tersedia di perangkat ini
             </div>
           )}
@@ -495,7 +495,7 @@ export default function MapViewerView({
         {scaleBar && (
           <div className="absolute left-3 bottom-[4.25rem] select-none" aria-label={`Skala jarak ${scaleBar.label}`}>
             <div className="flex flex-col items-start gap-0.5 px-1.5 py-1 bg-white/95 rounded-lg border border-[#121212] shadow-[1px_1px_0px_#121212]">
-              <span className="text-[9.5px] font-mono-code font-black leading-none">{scaleBar.label}</span>
+              <span className="text-[11px] font-mono-code font-black leading-none">{scaleBar.label}</span>
               {/* Bilah: lebar = pixels (px CSS), dengan ujung vertikal ala peta */}
               <div className="relative h-2.5" style={{ width: `${Math.round(scaleBar.pixels)}px` }}>
                 <div className="absolute left-0 top-0 w-px h-2.5 bg-[#121212]" />
@@ -507,7 +507,7 @@ export default function MapViewerView({
         )}
 
         {/* Badge offline */}
-        <div className="absolute left-3 bottom-24 flex items-center gap-1 px-2 py-1 bg-white/95 rounded-lg border border-[#121212] shadow-[1px_1px_0px_#121212] text-[9.5px] font-mono-code font-black">
+        <div className="absolute left-3 bottom-24 flex items-center gap-1 px-2 py-1 bg-white/95 rounded-lg border border-[#121212] shadow-[1px_1px_0px_#121212] text-[11px] font-mono-code font-black">
           <WifiOff className="w-3 h-3 text-[#38E54D]" />
           OFFLINE
         </div>
@@ -515,7 +515,7 @@ export default function MapViewerView({
 
       {/* Atribusi (wajib ODbL) */}
       {showAttribution && (
-        <div className="flex items-center justify-between gap-2 px-3 py-1.5 bg-white border-t-2 border-[#121212] text-[9.5px] font-mono-code font-bold text-gray-600">
+        <div className="flex items-center justify-between gap-2 px-3 py-1.5 bg-white border-t-2 border-[#121212] text-[11px] font-mono-code font-bold text-gray-600">
           <span className="flex items-center gap-1">
             <MapPin className="w-3 h-3" />
             © OpenStreetMap contributors (ODbL)

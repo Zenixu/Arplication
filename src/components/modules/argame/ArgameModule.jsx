@@ -125,7 +125,7 @@ export default function ArgameModule({ setActiveTab }) {
                     <h4 className="font-black text-base uppercase text-[#121212] group-hover:text-[#1A56DB]">
                       Sudoku Klasik
                     </h4>
-                    <span className="px-2 py-0.5 bg-[#38E54D] text-[#121212] text-[9px] font-mono-code font-black rounded border border-[#121212]">
+                    <span className="px-2 py-0.5 bg-[#38E54D] text-[#121212] text-[11px] font-mono-code font-black rounded border border-[#121212]">
                       Siap Main
                     </span>
                   </div>
@@ -151,7 +151,7 @@ export default function ArgameModule({ setActiveTab }) {
                     <h4 className="font-black text-base uppercase text-gray-700">
                       Flappy Bird
                     </h4>
-                    <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-[9px] font-mono-code font-black rounded border border-gray-400">
+                    <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-[11px] font-mono-code font-black rounded border border-gray-400">
                       Fase 2
                     </span>
                   </div>
@@ -173,7 +173,7 @@ export default function ArgameModule({ setActiveTab }) {
                     <h4 className="font-black text-base uppercase text-gray-700">
                       Reaction Duel (2P)
                     </h4>
-                    <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-[9px] font-mono-code font-black rounded border border-gray-400">
+                    <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-[11px] font-mono-code font-black rounded border border-gray-400">
                       Fase 3
                     </span>
                   </div>

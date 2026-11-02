@@ -373,12 +373,12 @@ export default function YTMusicSearchView({ playTrack, onDownload, currentId, pl
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[9px] font-mono-code font-black text-gray-500 uppercase tracking-wide">Hasil teratas</p>
+                <p className="text-[11px] font-mono-code font-black text-gray-500 uppercase tracking-wide">Hasil teratas</p>
                 <p className="text-sm font-black truncate leading-tight">{top.title}</p>
                 <p className="text-[10px] font-mono-code font-bold text-gray-500 truncate">
                   {top.artist}{top.durationFormatted ? ` • ${top.durationFormatted}` : ''}
                 </p>
-                <span className="inline-block mt-1 text-[8px] font-mono-code font-black px-1.5 py-0.5 rounded border border-black bg-[#C6F24E]">
+                <span className="inline-block mt-1 text-[10px] font-mono-code font-black px-1.5 py-0.5 rounded border border-black bg-[#C6F24E]">
                   LAGU
                 </span>
               </div>
@@ -400,7 +400,7 @@ export default function YTMusicSearchView({ playTrack, onDownload, currentId, pl
         );
       })()}
 
-      <p className="text-[9px] font-mono-code font-black text-gray-500 uppercase tracking-wide pt-1">Lagu</p>
+      <p className="text-[11px] font-mono-code font-black text-gray-500 uppercase tracking-wide pt-1">Lagu</p>
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[460px] md:max-h-[520px] overflow-y-auto pr-1">
       {results.slice(1).map((track) => {

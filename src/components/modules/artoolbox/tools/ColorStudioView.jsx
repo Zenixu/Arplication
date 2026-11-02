@@ -331,7 +331,7 @@ export default function ColorStudioView({ onBack, onRefreshHistory }) {
               >
                 <div>Teks Hitam</div>
                 <div className="text-lg font-black">{contrastBlack}:1</div>
-                <div className="text-[9px] font-bold">{Number(contrastBlack) >= 4.5 ? '✅ Lolos AA/AAA' : '⚠️ Kontras Rendah'}</div>
+                <div className="text-[11px] font-bold">{Number(contrastBlack) >= 4.5 ? '✅ Lolos AA/AAA' : '⚠️ Kontras Rendah'}</div>
               </div>
 
               <div
@@ -340,7 +340,7 @@ export default function ColorStudioView({ onBack, onRefreshHistory }) {
               >
                 <div>Teks Putih</div>
                 <div className="text-lg font-black">{contrastWhite}:1</div>
-                <div className="text-[9px] font-bold">{Number(contrastWhite) >= 4.5 ? '✅ Lolos AA/AAA' : '⚠️ Kontras Rendah'}</div>
+                <div className="text-[11px] font-bold">{Number(contrastWhite) >= 4.5 ? '✅ Lolos AA/AAA' : '⚠️ Kontras Rendah'}</div>
               </div>
             </div>
           </div>
@@ -426,7 +426,7 @@ export default function ColorStudioView({ onBack, onRefreshHistory }) {
                       className="w-full h-12 rounded-xl border-2 border-[#121212] shadow-[1.5px_1.5px_0px_#121212] group-hover:scale-105 transition-transform"
                       style={{ backgroundColor: c }}
                     />
-                    <span className="text-[9.5px] font-mono font-bold text-gray-700">{c}</span>
+                    <span className="text-[11px] font-mono font-bold text-gray-700">{c}</span>
                   </div>
                 ))}
               </div>
@@ -448,7 +448,7 @@ export default function ColorStudioView({ onBack, onRefreshHistory }) {
                       className="w-full h-12 rounded-xl border-2 border-[#121212] shadow-[1.5px_1.5px_0px_#121212] group-hover:scale-105 transition-transform"
                       style={{ backgroundColor: c }}
                     />
-                    <span className="text-[9.5px] font-mono font-bold text-gray-700">{c}</span>
+                    <span className="text-[11px] font-mono font-bold text-gray-700">{c}</span>
                   </div>
                 ))}
               </div>

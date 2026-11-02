@@ -124,7 +124,7 @@ export default function ToolboxHistoryModal({ isOpen, onClose, historyItems = []
                       {item.title}
                     </span>
                   </div>
-                  <span className="text-[9.5px] font-mono font-bold text-gray-500 shrink-0">
+                  <span className="text-[11px] font-mono font-bold text-gray-500 shrink-0">
                     {formatTime(item.timestamp)}
                   </span>
                 </div>

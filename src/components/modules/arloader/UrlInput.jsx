@@ -37,9 +37,9 @@ export default function UrlInput({ url, setUrl, onFetch, loading }) {
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Paste tautan Spotify, YouTube, TikTok, Instagram, X, Pinterest... (bisa multi-link)"
+          placeholder="Tempel tautan di sini…"
           rows={isMulti ? 3 : 1}
-          className="w-full text-xs font-bold text-[#121212] placeholder-gray-400 bg-transparent focus:outline-none resize-none min-h-[28px] max-h-[120px] py-1"
+          className="w-full text-[12.5px] font-bold text-[#121212] placeholder-gray-400 bg-transparent focus:outline-none resize-none min-h-[34px] max-h-[120px] py-1.5 leading-snug"
         />
 
         <div className="flex items-center gap-1 shrink-0 pt-0.5 sm:pt-0">
@@ -77,7 +77,7 @@ export default function UrlInput({ url, setUrl, onFetch, loading }) {
       <button
         onClick={onFetch}
         disabled={loading || !url.trim()}
-        className={`w-full font-mono-code font-black text-xs py-3 rounded-xl border-2 border-black transition-all flex items-center justify-center gap-2 uppercase tracking-wider ${
+        className={`w-full font-mono-code font-black text-[12.5px] py-3.5 rounded-xl border-2 border-black transition-all flex items-center justify-center gap-2 uppercase tracking-wider ${
           loading || !url.trim()
             ? 'bg-gray-200 text-gray-500 border-gray-400 cursor-not-allowed shadow-none'
             : 'bg-[#121212] hover:bg-black text-white shadow-[3px_3px_0px_#FFE600] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none cursor-pointer'

@@ -174,7 +174,7 @@ export default function ArloaderModule({ setActiveTab }) {
           </div>
           <div className="min-w-0">
             <p className="text-[11px] font-black uppercase leading-none">Arloader</p>
-            <p className="text-[9px] font-mono-code font-bold text-gray-500 truncate">Unduh media</p>
+            <p className="text-[11px] font-mono-code font-bold text-gray-500 truncate">Unduh media</p>
           </div>
         </div>
 
@@ -201,7 +201,7 @@ export default function ArloaderModule({ setActiveTab }) {
               </h2>
             </div>
           </div>
-          <span className="text-[9px] font-mono-code font-bold bg-[#F8F5EE] text-gray-700 px-2 py-0.5 border border-black rounded">
+          <span className="text-[11px] font-mono-code font-bold bg-[#F8F5EE] text-gray-700 px-2 py-0.5 border border-black rounded">
             MORI SUITE • v{APP_VERSION}
           </span>
         </div>
@@ -240,7 +240,7 @@ export default function ArloaderModule({ setActiveTab }) {
           <h3 className="font-mono-code font-black text-[11px] text-[#121212] uppercase tracking-wider">
             Platform
           </h3>
-          <span className="font-mono-code text-[9px] font-bold text-gray-600 bg-white px-1.5 py-0.5 border border-black rounded shadow-[1px_1px_0px_#121212]">
+          <span className="font-mono-code text-[11px] font-bold text-gray-600 bg-white px-1.5 py-0.5 border border-black rounded shadow-[1px_1px_0px_#121212]">
             AUTO DETECT
           </span>
         </div>
@@ -351,7 +351,7 @@ export default function ArloaderModule({ setActiveTab }) {
               ANTREAN UNDUHAN
             </h4>
           </div>
-          <div className="flex items-center gap-1.5 font-mono-code text-[9px] font-black">
+          <div className="flex items-center gap-1.5 font-mono-code text-[11px] font-black">
             <span className="bg-[#38E54D] text-black px-1.5 py-0.5 border border-black rounded shadow-[1px_1px_0px_#121212]">
               {totalDownloads} DONE
             </span>
@@ -363,15 +363,15 @@ export default function ArloaderModule({ setActiveTab }) {
 
         <div className="grid grid-cols-3 gap-2 text-center">
           <div className="bg-[#F8F5EE] border-2 border-black rounded-xl p-2 shadow-[1.5px_1.5px_0px_#121212]">
-            <div className="text-[9px] font-mono-code font-black text-gray-600 uppercase">Downloads</div>
+            <div className="text-[11px] font-mono-code font-black text-gray-600 uppercase">Downloads</div>
             <div className="text-sm font-black text-[#121212] mt-0.5">{totalDownloads}</div>
           </div>
           <div className="bg-[#F8F5EE] border-2 border-black rounded-xl p-2 shadow-[1.5px_1.5px_0px_#121212]">
-            <div className="text-[9px] font-mono-code font-black text-gray-600 uppercase">Est. Storage</div>
+            <div className="text-[11px] font-mono-code font-black text-gray-600 uppercase">Est. Storage</div>
             <div className="text-sm font-black text-[#121212] mt-0.5">{formattedStorage}</div>
           </div>
           <div className="bg-[#F8F5EE] border-2 border-black rounded-xl p-2 shadow-[1.5px_1.5px_0px_#121212]">
-            <div className="text-[9px] font-mono-code font-black text-gray-600 uppercase">Sandbox</div>
+            <div className="text-[11px] font-mono-code font-black text-gray-600 uppercase">Sandbox</div>
             <div className="text-sm font-black text-emerald-800 mt-0.5">100%</div>
           </div>
         </div>

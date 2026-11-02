@@ -95,7 +95,7 @@ export default function RegionCatalogView({
           <h2 className="text-xs font-black uppercase tracking-wider text-[#121212]">
             Katalog Wilayah
           </h2>
-          <span className="text-[9.5px] font-mono-code font-black bg-white px-2 py-0.5 rounded border border-black shadow-[1px_1px_0px_#121212]">
+          <span className="text-[11px] font-mono-code font-black bg-white px-2 py-0.5 rounded border border-black shadow-[1px_1px_0px_#121212]">
             {catalog.length} WILAYAH
           </span>
         </div>
@@ -124,7 +124,7 @@ export default function RegionCatalogView({
                   </div>
                 </div>
                 {isInstalled && (
-                  <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#38E54D] border border-[#121212] shadow-[1px_1px_0px_#121212] text-[9px] font-mono-code font-black uppercase">
+                  <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#38E54D] border border-[#121212] shadow-[1px_1px_0px_#121212] text-[11px] font-mono-code font-black uppercase">
                     <Check className="w-3 h-3" /> Terpasang
                   </span>
                 )}
@@ -217,19 +217,19 @@ export default function RegionCatalogView({
             <p className="text-xs font-semibold text-gray-700">{detail.description}</p>
             <div className="grid grid-cols-2 gap-2 text-[11px] font-mono-code font-bold">
               <div className="p-2 rounded-lg bg-white border border-[#121212]">
-                <div className="text-gray-500 text-[9px] uppercase">Ukuran</div>
+                <div className="text-gray-500 text-[11px] uppercase">Ukuran</div>
                 ≈ {formatBytes(detail.sizeBytes)}
               </div>
               <div className="p-2 rounded-lg bg-white border border-[#121212]">
-                <div className="text-gray-500 text-[9px] uppercase">Zoom maks</div>
+                <div className="text-gray-500 text-[11px] uppercase">Zoom maks</div>
                 {detail.maxzoom}
               </div>
               <div className="p-2 rounded-lg bg-white border border-[#121212] col-span-2">
-                <div className="text-gray-500 text-[9px] uppercase">Batas (bbox)</div>
+                <div className="text-gray-500 text-[11px] uppercase">Batas (bbox)</div>
                 {detail.bbox.join(', ')}
               </div>
               <div className="p-2 rounded-lg bg-white border border-[#121212] col-span-2">
-                <div className="text-gray-500 text-[9px] uppercase">Data OSM</div>
+                <div className="text-gray-500 text-[11px] uppercase">Data OSM</div>
                 {formatDataDate(MAPS_DATA_DATE)}
               </div>
             </div>

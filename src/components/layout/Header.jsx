@@ -46,11 +46,11 @@ export default function Header({ activeTab, setActiveTab }) {
               <span className="font-black text-sm sm:text-base uppercase tracking-wider text-[#121212]">
                 ARPLICATION
               </span>
-              <span className="text-[9px] sm:text-[10px] font-mono-code font-black bg-[#38E54D] text-[#121212] px-1.5 py-0.5 border border-[#121212] rounded shadow-[1px_1px_0px_#121212]">
+              <span className="text-[11px] sm:text-[10px] font-mono-code font-black bg-[#38E54D] text-[#121212] px-1.5 py-0.5 border border-[#121212] rounded shadow-[1px_1px_0px_#121212]">
                 v{APP_VERSION}
               </span>
             </div>
-            <span className="hidden sm:block text-[8.5px] sm:text-[9px] font-mono-code font-bold text-[#121212]/60 tracking-wider mt-0.5">
+            <span className="hidden sm:block text-[10px] sm:text-[11px] font-mono-code font-bold text-[#121212]/60 tracking-wider mt-0.5">
               MORI SUITE • BENTO
             </span>
           </div>

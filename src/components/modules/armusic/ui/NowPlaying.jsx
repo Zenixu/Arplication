@@ -131,7 +131,7 @@ export default function NowPlaying({
           <ChevronDown className="w-5 h-5" />
         </button>
         <div className="text-center">
-          <p className="text-[9px] font-mono-code font-black uppercase tracking-widest text-[#121212]/50">Sedang diputar</p>
+          <p className="text-[11px] font-mono-code font-black uppercase tracking-widest text-[#121212]/50">Sedang diputar</p>
           <p className="text-[11px] font-black truncate max-w-[52vw]">{track.title}</p>
         </div>
         <div className="flex items-center gap-1.5">
@@ -192,7 +192,7 @@ export default function NowPlaying({
                   </p>
                 </div>
                 {track.source === 'ytmusic' && (
-                  <span className="shrink-0 text-[9px] font-mono-code font-black uppercase px-1.5 py-0.5 bg-[#FF70A6] border-2 border-[#121212] rounded-md shadow-[1.5px_1.5px_0px_#121212]">
+                  <span className="shrink-0 text-[11px] font-mono-code font-black uppercase px-1.5 py-0.5 bg-[#FF70A6] border-2 border-[#121212] rounded-md shadow-[1.5px_1.5px_0px_#121212]">
                     YT
                   </span>
                 )}
@@ -292,7 +292,7 @@ export default function NowPlaying({
                     <span className="w-5 text-[10px] font-mono-code font-black text-[#121212]/40 shrink-0">{i + 1}</span>
                     <div className="min-w-0 flex-1">
                       <p className="text-[11px] font-black truncate">{t.title}</p>
-                      <p className="text-[9px] font-mono-code font-bold text-[#121212]/45 truncate">{t.artist}</p>
+                      <p className="text-[11px] font-mono-code font-bold text-[#121212]/45 truncate">{t.artist}</p>
                     </div>
                     {active && <Music2 className="w-3.5 h-3.5 shrink-0" />}
                   </button>
