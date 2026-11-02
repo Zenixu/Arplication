@@ -11,6 +11,8 @@ import { publishNowPlaying, setPlaybackState, setPositionState, clearNowPlaying,
 import { loadPlaylists, savePlaylists, createPlaylist, renamePlaylist, deletePlaylist, addTrackToPlaylist, removeTrackFromPlaylist, resolvePlaylistTracks, purgeTrackFromPlaylists, isTrackInPlaylist, groupTracksBy, } from '../../../services/playlistManager.js';
 import { fetchLyrics, activeLyricIndex, } from '../../../services/lyrics.js';
 import { registerBackHandler } from '../../../services/backHandler.js';
+import { resolveYouTubeMusicAudioUrl } from '../../../services/musicStream.js';
+import { formatResolverError } from '../../../services/scrapers/youtube.js';
 import YTMusicWrapper from './YTMusicWrapper.jsx';
 import ArMusicUI from './ui/ArMusicUI.jsx';
 
@@ -171,6 +173,10 @@ export default function ArMusicModule({ setActiveTab }) {
   const nativeSupportRef = useRef(null); // null=belum deteksi, bool=hasil nativePlaybackSupported()
   const effectiveQueueRef = useRef([]); // snapshot list yang dikirim ke native (peta index→id)
   const currentIdRef = useRef(null);
+  // Antrean dari luar library (mis. hasil pencarian YouTube). Item di-resolve
+  // saat gilirannya tiba, karena ExoPlayer butuh URI yang sudah siap.
+  const sourceQueueRef = useRef([]);
+  const sourceIndexRef = useRef(-1);
   const pollNativeOnceRef = useRef(null);
   // Refs agar MediaSession action handler selalu memanggil versi terbaru
   const togglePlayRef = useRef(null);
@@ -309,6 +315,13 @@ export default function ArMusicModule({ setActiveTab }) {
   const playTrack = async (track, forceReplay = false, queueOverride = null) => {
     if (!track || track.unavailable) return;
     setError(null);
+    // Catat antrean sumber lebih dulu: jalur native MAUPUN WebView butuh ini
+    // supaya "berikutnya" tetap di dalam hasil pencarian, bukan ke library.
+    if (Array.isArray(queueOverride) && queueOverride.length > 0) {
+      sourceQueueRef.current = queueOverride;
+      const at = queueOverride.findIndex((t) => t.id === track.id);
+      sourceIndexRef.current = at >= 0 ? at : 0;
+    }
     const src = toPlayableSrc(track.uri);
     if (!src) {
       setError(`File "${track.filename || track.title}" tidak bisa dibuka. Pilih ulang dari storage.`);
@@ -341,12 +354,18 @@ export default function ArMusicModule({ setActiveTab }) {
     try { audioRef.current?.pause(); } catch { /* abaikan */ }
     // queueOverride dipakai putar-dari-playlist: queue native = isi playlist,
     // bukan list search/library aktif.
-    const baseList = (Array.isArray(queueOverride) && queueOverride.length > 0)
-      ? queueOverride
+    // queueOverride dipakai putar-dari-playlist / hasil pencarian.
+    const override = (Array.isArray(queueOverride) && queueOverride.length > 0) ? queueOverride : null;
+    // Native hanya boleh menerima item yang sudah punya URI: playlist lokal
+    // (semua URI siap) tetap utuh, sedangkan hasil pencarian YouTube hanya
+    // membawa URI lagu yang sedang diputar.
+    const playableOverride = override ? override.filter((t) => t && t.uri) : [];
+    const baseList = playableOverride.some((t) => t.id === track.id)
+      ? playableOverride
       : effectiveList();
     let ordered = buildOrdered(baseList, shuffle);
     let idx = ordered.findIndex((t) => t.id === track.id);
-    if (idx < 0) { ordered = [track, ...ordered]; idx = 0; }
+    if (idx < 0) { ordered = [track]; idx = 0; }
     const ok = await playNativeQueue(ordered, idx, { repeatOne });
     if (ok) {
       nativeModeRef.current = true;
@@ -422,7 +441,50 @@ export default function ArMusicModule({ setActiveTab }) {
     ? [...Array(fromFiltered.length).keys()].sort(() => Math.random() - 0.5)
     : [...Array(fromFiltered.length).keys()]);
 
-  const nextTrack = (auto = false) => {
+  /** Putar satu item dari antrean sumber, resolve URI-nya lebih dulu bila perlu. */
+  const playSourceItem = async (item) => {
+    if (!item) return;
+    try {
+      let uri = item.uri;
+      if (!uri) {
+        setError(null);
+        const url = await resolveYouTubeMusicAudioUrl({
+          videoId: item.videoId,
+          query: `${item.title || ''} ${item.artist || ''}`.trim(),
+        });
+        if (!url) throw new Error('Stream audio tidak dapat di-resolve.');
+        uri = url;
+        const at = sourceQueueRef.current.findIndex((t) => t.id === item.id);
+        if (at >= 0) sourceQueueRef.current[at] = { ...item, uri };
+      }
+      await playTrack({ ...item, uri });
+    } catch (err) {
+      setError(formatResolverError(err, item.title || 'Lagu ini'));
+    }
+  };
+
+  const nextTrack = async (auto = false) => {
+    // Antrean sumber (hasil pencarian) punya urutan sendiri — jangan
+    // melompat ke library yang sudah diunduh.
+    const src = sourceQueueRef.current;
+    // Hanya antrean stream (hasil pencarian) yang dikelola JS, karena tiap item
+    // perlu di-resolve saat gilirannya. Antrean playlist lokal tetap dipegang
+    // ExoPlayer supaya transisi antar lagu tidak terputus.
+    const isStreamQueue = src.some((t) => t && t.source === 'stream');
+    if (isStreamQueue && src.some((t) => t.id === currentIdRef.current)) {
+      if (auto && repeatOne) return; // ExoPlayer yang mengulang
+      const nextIdx = sourceIndexRef.current + 1;
+      if (nextIdx >= src.length) {
+        if (repeatOne) {
+          sourceIndexRef.current = 0;
+          await playSourceItem(src[0]);
+        }
+        return;
+      }
+      sourceIndexRef.current = nextIdx;
+      await playSourceItem(src[nextIdx]);
+      return;
+    }
     if (nativeModeRef.current) {
       if (auto) return; // auto-advance dipegang ExoPlayer; event 'advanced' sinkronkan UI
       nextNativeTrack();
@@ -447,6 +509,13 @@ export default function ArMusicModule({ setActiveTab }) {
   };
 
   const prevTrack = () => {
+    const src = sourceQueueRef.current;
+    if (src.some((t) => t && t.source === 'stream') && src.some((t) => t.id === currentIdRef.current)) {
+      const prevIdx = Math.max(0, sourceIndexRef.current - 1);
+      sourceIndexRef.current = prevIdx;
+      playSourceItem(src[prevIdx]);
+      return;
+    }
     if (nativeModeRef.current) {
       prevNativeTrack();
       setTimeout(() => pollNativeOnceRef.current?.(), 350);
@@ -573,6 +642,11 @@ export default function ArMusicModule({ setActiveTab }) {
         return;
       }
       if (action === 'queue-ended' || action === 'queueended') {
+        if (sourceQueueRef.current.length > 1
+          && sourceQueueRef.current.some((t) => t && t.source === 'stream')) {
+          nextTrack(true);
+          return;
+        }
         setPlaying(false);
         setPlaybackState(false);
         return;
@@ -936,9 +1010,14 @@ export default function ArMusicModule({ setActiveTab }) {
   };
 
   // Antrean yang dipakai Now Playing (mengikuti urutan shuffle bila aktif).
-  const queueList = (shuffle && order.length === tracks.length)
-    ? order.map((i) => tracks[i]).filter(Boolean)
-    : (filtered.length > 0 ? filtered : tracks);
+  // Kalau yang diputar berasal dari antrean sumber (hasil pencarian), tab
+  // Antrean harus menampilkan antrean itu — bukan daftar lagu unduhan.
+  const playingFromSource = sourceQueueRef.current.some((t) => t && t.id === currentId);
+  const queueList = playingFromSource
+    ? sourceQueueRef.current
+    : (shuffle && order.length === tracks.length)
+      ? order.map((i) => tracks[i]).filter(Boolean)
+      : (filtered.length > 0 ? filtered : tracks);
   const queueIndex = Math.max(0, queueList.findIndex((t) => t.id === currentId));
 
   return (

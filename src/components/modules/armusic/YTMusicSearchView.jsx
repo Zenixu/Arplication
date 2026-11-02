@@ -119,19 +119,28 @@ export default function YTMusicSearchView({ playTrack, onDownload, currentId, pl
       }
 
       // Bangun track object ala ArMusic library
-      const playableTrack = {
-        id: `ytm:${track.videoId}`,
-        title: track.title,
-        artist: track.artist || 'YouTube Music',
-        filename: `${track.title}.mp3`,
+      const toPlayable = (row, uri) => ({
+        id: `ytm:${row.videoId}`,
+        title: row.title,
+        artist: row.artist || 'YouTube Music',
+        filename: `${row.title}.mp3`,
         folder: 'YouTube Music',
-        uri: audioUrl,
-        durationSec: track.duration || 0,
+        uri,
+        durationSec: row.duration || 0,
         source: 'stream',
-        streamRef: track,
-      };
+        streamRef: row,
+        videoId: row.videoId,
+      });
 
-      await playTrack(playableTrack);
+      const playableTrack = toPlayable(track, audioUrl);
+      // Antrean = seluruh hasil pencarian, supaya "berikutnya" melanjutkan ke
+      // hasil berikutnya, bukan melompat ke lagu yang sudah diunduh.
+      // Item lain belum punya URI — di-resolve saat gilirannya tiba.
+      const queue = results.map((row) =>
+        row.videoId === track.videoId ? playableTrack : toPlayable(row, null),
+      );
+
+      await playTrack(playableTrack, false, queue);
     } catch (err) {
       if (isMountedRef.current) {
         const msg = formatResolverError(err, track?.title || query);

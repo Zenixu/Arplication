@@ -7,6 +7,25 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.5] - 2026-11-02
+
+# v1.9.5 — Antrean pencarian tidak lagi melompat
+
+## Perbaikan
+- **"Berikutnya" saat memutar hasil pencarian YouTube tidak lagi melompat ke
+  lagu unduhan.** Dulu antrean pemutar selalu diambil dari library, jadi lagu
+  dari YouTube dianggap "tidak ada di antrean" dan ExoPlayer lanjut ke lagu
+  unduhan pertama. Sekarang antrean = seluruh hasil pencarian, dan tiap item
+  di-resolve saat gilirannya tiba.
+- Berlaku untuk kedua jalur: ExoPlayer (HP) dan `<audio>` WebView.
+- "Sebelumnya" ikut memakai antrean yang sama, dan saat satu lagu habis
+  pemutar otomatis lanjut ke hasil berikutnya.
+- Lagu yang tidak ada di library dan diputar tanpa antrean (mis. dari feed)
+  kini diantrekan sendirian, bukan ditempel ke depan library.
+- **Tab Antrean** ikut menampilkan 20 hasil pencarian, bukan daftar lagu unduhan.
+- Antrean playlist lokal tetap dipegang ExoPlayer (tidak di-resolve ulang),
+  supaya transisi antar lagu unduhan tidak terputus.
+
 ## [1.9.4] - 2026-11-02
 
 # v1.9.4 — Tanpa server
