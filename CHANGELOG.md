@@ -7,6 +7,32 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.17] - 2026-11-02
+
+# v1.9.17 — Kartu homescreen menampilkan keadaan sebenarnya
+
+## Perbaikan
+Keterangan di bawah tiap kartu ALAT sebelumnya teks tetap. Sekarang mengikuti
+data nyata:
+
+| Kartu | Sebelum | Sesudah |
+|---|---|---|
+| ARLOADER | "Unduh video & audio" | "Terakhir: Kuliah Sistem Operasi" (judul unduhan terakhir) |
+| ARMUSIC | "Pemutar musik" | "Handayani · SOLARPUNK" (lagu yang sedang diputar) |
+| ARDORO | "Pomodoro 25 menit" | "11:43 · fokus" (sisa waktu timer) |
+
+- Timer Ardoro dibaca lewat `loadTimerState()` yang sudah menghitung sisa waktu
+  dari `endAt`, jadi angkanya benar walau aplikasi sempat ditutup.
+- Saat timer dijeda: "Jeda · mm:ss".
+- Kalau datanya belum ada, kembali ke teks semula ("Belum ada unduhan",
+  "Pemutar musik", "Pomodoro 25 menit") — bukan angka karangan.
+- Data disegarkan tiap 15 detik dan saat aplikasi kembali aktif.
+
+## Verifikasi
+Diuji dengan data contoh: ketiga kartu menampilkan info benar, dan hitungan
+Ardoro ikut turun (11:58 → 11:43). Tanpa data: ketiganya kembali ke teks default.
+Tidak ada teks yang meluap di 390px.
+
 ## [1.9.16] - 2026-11-02
 
 # v1.9.16 — Enam platform, klaim "12+" dihapus

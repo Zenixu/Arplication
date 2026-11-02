@@ -43,9 +43,10 @@ Satu item = satu perubahan yang bisa dirilis sendiri.
       Instagram, Spotify, X, Pinterest) — yang mati hanya tombol X & Pinterest di
       UI lama. Klaim "12+" dihapus, keenamnya sekarang tampil sebagai chip.
 
-- [ ] **A6 · `P1` · `M` · Isi kartu homescreen dengan info hidup.**
-      Ardoro: sisa waktu timer. Artoolbox: chip alat favorit.
-      ARLOADER: unduhan terakhir. ARMUSIC: mini player + tombol acak.
+- [x] **A6 · `P1` · `M` · Isi kartu homescreen dengan info hidup.** — **selesai di v1.9.17**
+      ARLOADER: "Terakhir: <judul unduhan>". ARMUSIC: judul · artis yang sedang
+      diputar. ARDORO: sisa waktu timer ("11:43 · fokus") atau "Jeda · mm:ss".
+      Artoolbox tetap statis karena isinya memang daftar alat.
 
 - [ ] **A7 · `P2` · `M` · Cover art untuk lagu di ArMusic.**
       Sekarang kotak warna kosong. Ambil dari thumbnail hasil unduhan.

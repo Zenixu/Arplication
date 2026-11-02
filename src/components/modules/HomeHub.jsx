@@ -6,6 +6,7 @@ import { getDownloadHistory } from '../../utils/history.js';
 import { getAllNotes } from '../../services/notesDb.js';
 import { readNowPlaying, readRecentPlays } from '../../services/nowPlaying.js';
 import { ARMUSIC_LIBRARY_KEY } from '../../services/localMusic.js';
+import { loadTimerState } from '../../utils/pomodoro.js';
 
 /**
  * Homescreen "bento" — mengikuti desain di ~/figcraft/home-redesign.figcraft.
@@ -55,6 +56,8 @@ export default function HomeHub({ setActiveTab }) {
   const [nowPlaying, setNowPlaying] = useState(() => readNowPlaying());
   const [recent, setRecent] = useState(() => readRecentPlays(3));
   const [downloads, setDownloads] = useState(() => getDownloadHistory().length);
+  const [lastDownload, setLastDownload] = useState(() => getDownloadHistory()[0]?.title || '');
+  const [timerState, setTimerState] = useState(() => loadTimerState());
   const [libraryCount, setLibraryCount] = useState(() => readLibraryCount());
   const [pinnedNotes, setPinnedNotes] = useState(0);
   const [noteCount, setNoteCount] = useState(0);
@@ -67,7 +70,10 @@ export default function HomeHub({ setActiveTab }) {
     const refresh = async () => {
       setNowPlaying(readNowPlaying());
       setRecent(readRecentPlays(3));
-      setDownloads(getDownloadHistory().length);
+      const riwayat = getDownloadHistory();
+      setDownloads(riwayat.length);
+      setLastDownload(riwayat[0]?.title || '');
+      setTimerState(loadTimerState());
       setLibraryCount(readLibraryCount());
       try {
         const notes = await getAllNotes();
@@ -96,6 +102,29 @@ export default function HomeHub({ setActiveTab }) {
     if (!nowPlaying || !nowPlaying.duration) return 0;
     return Math.min(100, Math.max(0, (nowPlaying.elapsed / nowPlaying.duration) * 100));
   }, [nowPlaying]);
+
+  // Info ringkas yang mengikuti keadaan sebenarnya — bukan teks tetap.
+  const dynamicInfo = useMemo(() => {
+    const t = timerState;
+    let ardoro = 'Pomodoro 25 menit';
+    if (t && t.running && t.remaining > 0) {
+      ardoro = `${formatTime(t.remaining)} · ${t.phase === 'focus' ? 'fokus' : 'istirahat'}`;
+    } else if (t && t.remaining > 0) {
+      ardoro = `Jeda · ${formatTime(t.remaining)}`;
+    }
+
+    const lagu = nowPlaying?.title
+      ? `${nowPlaying.title}${nowPlaying.artist ? ` · ${nowPlaying.artist}` : ''}`
+      : '';
+
+    return {
+      arloader: lastDownload ? `Terakhir: ${lastDownload}` : 'Belum ada unduhan',
+      armusic: lagu || 'Pemutar musik',
+      ardoro,
+    };
+  }, [timerState, nowPlaying, lastDownload]);
+
+  const infoFor = (mod) => dynamicInfo[mod.id] || mod.info;
 
   const open = (id) => setActiveTab?.(id);
 
@@ -283,7 +312,7 @@ export default function HomeHub({ setActiveTab }) {
                     {mod.short}
                   </span>
                   <span className="block text-[10px] font-mono-code font-bold text-[#121212]/45 leading-tight line-clamp-2">
-                    {mod.info}
+                    {infoFor(mod)}
                   </span>
                 </span>
               ) : (
@@ -293,7 +322,7 @@ export default function HomeHub({ setActiveTab }) {
                   </span>
                   {mod.layout === 'tall' && (
                     <span className="block text-[10px] font-mono-code font-bold text-[#121212]/45 leading-tight mt-0.5">
-                      {mod.info}
+                      {infoFor(mod)}
                     </span>
                   )}
                 </span>
@@ -319,7 +348,7 @@ export default function HomeHub({ setActiveTab }) {
                 </span>
                 <span className="flex-1 min-w-0">
                   <span className="block text-[10px] font-black uppercase truncate">{mod.title}</span>
-                  <span className="block text-[10px] font-mono-code font-bold text-[#121212]/45 truncate">{mod.info}</span>
+                  <span className="block text-[10px] font-mono-code font-bold text-[#121212]/45 truncate">{infoFor(mod)}</span>
                 </span>
                 <ChevronRight className="w-3.5 h-3.5 text-[#121212]/40 shrink-0" />
               </button>
