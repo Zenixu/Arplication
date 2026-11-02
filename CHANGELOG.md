@@ -7,6 +7,21 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.9] - 2026-11-02
+
+# v1.9.9 — Tiga gaya kartu di bagian Alat
+
+## Perbaikan
+- **Kartu lebar (ARLOADER, ARMUSIC):** logo sekarang memenuhi sisi kiri setinggi
+  kartu, separuh kanan berisi nama + informasi. Sebelumnya logo kecil dan sisa
+  kanan kosong.
+- **Kartu kotak (Armaps, Arnotes, Aruthtale, Argame):** logo diperbesar dan
+  diletakkan di tengah, teks di bawahnya juga di tengah. Tanpa informasi tambahan.
+- **Kartu tinggi (Ardoro, Artoolbox):** logo diperbesar di bagian atas (tengah),
+  nama + informasi di bawahnya, rata tengah.
+- Ukuran logo menyesuaikan jenis kartu (56px di kartu lebar, 48px di kartu tinggi,
+  40px di kartu kotak), jadi tidak ada lagi ruang kosong menganggur di tengah kartu.
+
 ## [1.9.8] - 2026-11-02
 
 # v1.9.8 — Homescreen bento

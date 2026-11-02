@@ -19,15 +19,21 @@ import { ARMUSIC_LIBRARY_KEY } from '../../services/localMusic.js';
  * belum ada, kartu menampilkan keadaan kosong — bukan angka karangan.
  */
 
+/**
+ * layout:
+ *   'wide' → logo memenuhi sisi kiri (setinggi kartu), separuh kanan untuk info
+ *   'tile' → logo besar di tengah, teks di bawah, tanpa info tambahan
+ *   'tall' → logo besar di atas (tengah), info di bawahnya
+ */
 const MODULES = [
-  { id: 'arloader',  title: 'Arloader',  short: 'Arloader',  desc: 'Unduh video & audio', icon: '/arloader.png',  accent: '#FFE600', span: 'col-span-2' },
-  { id: 'armaps',    title: 'ArMaps',    short: 'Armaps',    desc: 'Peta offline',        icon: '/armaps.png',    accent: '#D8B4FE', span: 'col-span-1' },
-  { id: 'ardoro',    title: 'Ardoro',    short: 'Ardoro',    desc: 'Timer fokus',         icon: '/ardoro.png',    accent: '#FF70A6', span: 'col-span-1 row-span-2' },
-  { id: 'artoolbox', title: 'ArToolbox', short: 'Artoolbox', desc: 'Perkakas praktis',    icon: '/artoolbox.png', accent: '#9AD7FF', span: 'col-span-1 row-span-2' },
-  { id: 'arnote',    title: 'ArNote',    short: 'Arnotes',   desc: 'Catatan & checklist', icon: '/arnote.png',    accent: '#C6F24E', span: 'col-span-1' },
-  { id: 'aruthtale', title: 'Aruthtale', short: 'Aruthtale', desc: 'Info & diagnostik',   icon: '/logo.png',      accent: '#E7E3D8', span: 'col-span-1' },
-  { id: 'argame',    title: 'ArGame',    short: 'Argame',    desc: 'Game santai',         icon: '/Argame.png',    accent: '#FFC46B', span: 'col-span-1' },
-  { id: 'armusic',   title: 'ArMusic',   short: 'Armusic',   desc: 'Pemutar musik',       icon: '/armusic.png',   accent: '#C6F24E', span: 'col-span-2' },
+  { id: 'arloader',  title: 'Arloader',  short: 'Arloader',  info: 'Unduh video & audio',      icon: '/arloader.png',  accent: '#FFE600', span: 'col-span-2',            layout: 'wide' },
+  { id: 'armaps',    title: 'ArMaps',    short: 'Armaps',    info: 'Peta offline',             icon: '/armaps.png',    accent: '#D8B4FE', span: 'col-span-1',            layout: 'tile' },
+  { id: 'ardoro',    title: 'Ardoro',    short: 'Ardoro',    info: 'Pomodoro 25 menit',        icon: '/ardoro.png',    accent: '#FF70A6', span: 'col-span-1 row-span-2', layout: 'tall' },
+  { id: 'artoolbox', title: 'ArToolbox', short: 'Artoolbox', info: 'QR · Kalkulator · Warna',  icon: '/artoolbox.png', accent: '#9AD7FF', span: 'col-span-1 row-span-2', layout: 'tall' },
+  { id: 'arnote',    title: 'ArNote',    short: 'Arnotes',   info: 'Catatan & checklist',      icon: '/arnote.png',    accent: '#C6F24E', span: 'col-span-1',            layout: 'tile' },
+  { id: 'aruthtale', title: 'Aruthtale', short: 'Aruthtale', info: 'Info & diagnostik',        icon: '/logo.png',      accent: '#E7E3D8', span: 'col-span-1',            layout: 'tile' },
+  { id: 'argame',    title: 'ArGame',    short: 'Argame',    info: 'Game santai',              icon: '/Argame.png',    accent: '#FFC46B', span: 'col-span-1',            layout: 'tile' },
+  { id: 'armusic',   title: 'ArMusic',   short: 'Armusic',   info: 'Pemutar musik',            icon: '/armusic.png',   accent: '#C6F24E', span: 'col-span-2',            layout: 'wide' },
 ];
 
 function readLibraryCount() {
@@ -248,24 +254,50 @@ export default function HomeHub({ setActiveTab }) {
             <button
               key={mod.id}
               onClick={() => open(mod.id)}
-              className={`${mod.span} text-left bg-white border-2 border-[#121212] rounded-xl shadow-[3px_3px_0_#121212] p-2 flex flex-col justify-between overflow-hidden active:translate-y-0.5 active:shadow-[1px_1px_0_#121212] transition-all`}
+              className={`${mod.span} bg-white border-2 border-[#121212] rounded-xl shadow-[3px_3px_0_#121212] overflow-hidden active:translate-y-0.5 active:shadow-[1px_1px_0_#121212] transition-all ${
+                mod.layout === 'wide'
+                  ? 'p-1 flex items-center gap-2 text-left'
+                  : mod.layout === 'tall'
+                    ? 'p-2 flex flex-col items-center gap-1 text-center'
+                    : 'p-1.5 flex flex-col items-center justify-center gap-1 text-center'
+              }`}
             >
+              {/* logo */}
               <span
-                className="w-8 h-8 md:w-9 md:h-9 rounded-lg border-2 border-[#121212] flex items-center justify-center overflow-hidden shrink-0"
+                className={`rounded-lg border-2 border-[#121212] flex items-center justify-center overflow-hidden shrink-0 ${
+                  mod.layout === 'wide'
+                    ? 'w-[56px] h-[56px] md:w-[64px] md:h-[64px]'  // memenuhi tinggi kartu
+                    : mod.layout === 'tall'
+                      ? 'w-12 h-12 md:w-14 md:h-14 mt-0.5'        // lebih besar, di tengah atas
+                      : 'w-10 h-10 md:w-11 md:h-11'               // mengisi tile kotak
+                }`}
                 style={{ backgroundColor: mod.accent }}
               >
-                <img src={mod.icon} alt="" className="w-full h-full object-contain p-0.5" loading="lazy" />
+                <img src={mod.icon} alt="" className="w-full h-full object-contain p-[3px]" loading="lazy" />
               </span>
 
-              <span className="block min-w-0">
-                <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-tight leading-tight truncate">
-                  {mod.short}
+              {mod.layout === 'wide' ? (
+                /* separuh kanan: nama + informasi */
+                <span className="flex-1 min-w-0 flex flex-col justify-center">
+                  <span className="block text-[10px] md:text-[11px] font-black uppercase tracking-tight leading-tight truncate">
+                    {mod.short}
+                  </span>
+                  <span className="block text-[8px] font-mono-code font-bold text-[#121212]/45 leading-tight truncate">
+                    {mod.info}
+                  </span>
                 </span>
-                {/* di layar lebar semua tile menampilkan deskripsi singkat */}
-                <span className={`text-[7.5px] font-mono-code font-bold text-[#121212]/45 truncate ${mod.span === 'col-span-2' ? 'block' : 'hidden md:block'}`}>
-                  {mod.desc}
+              ) : (
+                <span className="block w-full min-w-0">
+                  <span className="block text-[9px] md:text-[10px] font-black uppercase tracking-tight leading-tight truncate">
+                    {mod.short}
+                  </span>
+                  {mod.layout === 'tall' && (
+                    <span className="block text-[7.5px] font-mono-code font-bold text-[#121212]/45 leading-tight mt-0.5">
+                      {mod.info}
+                    </span>
+                  )}
                 </span>
-              </span>
+              )}
             </button>
           ))}
         </div>
@@ -287,7 +319,7 @@ export default function HomeHub({ setActiveTab }) {
                 </span>
                 <span className="flex-1 min-w-0">
                   <span className="block text-[10px] font-black uppercase truncate">{mod.title}</span>
-                  <span className="block text-[8px] font-mono-code font-bold text-[#121212]/45 truncate">{mod.desc}</span>
+                  <span className="block text-[8px] font-mono-code font-bold text-[#121212]/45 truncate">{mod.info}</span>
                 </span>
                 <ChevronRight className="w-3.5 h-3.5 text-[#121212]/40 shrink-0" />
               </button>
