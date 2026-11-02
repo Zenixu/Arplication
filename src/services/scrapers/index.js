@@ -17,7 +17,7 @@ export function detectPlatform(url) {
 
 export async function resolveMediaUrl(url) {
   if (!url || typeof url !== 'string' || !url.trim()) {
-    throw new Error('Please enter or paste a valid link.');
+    throw new Error('Tempel tautan dulu ya.');
   }
 
   const cleanUrl = url.trim();
@@ -48,7 +48,7 @@ export async function resolveMediaUrl(url) {
   }
 
   throw new Error(
-    'Unsupported platform URL. Currently Arloader supports TikTok, YouTube, Instagram, Spotify, X (Twitter), and Pinterest links.'
+    'Platform belum didukung. Arloader bisa mengunduh dari TikTok, YouTube, Instagram, Spotify, X, dan Pinterest.'
   );
 }
 

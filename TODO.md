@@ -38,9 +38,10 @@ Satu item = satu perubahan yang bisa dirilis sendiri.
 - [ ] **A4 · `P1` · `S` · Modal pengaturan Arloader masih bernomor "1. … 4."**
       Ganti jadi judul biasa tanpa angka.
 
-- [ ] **A5 · `P1` · `S` · Klaim platform belum jujur.**
-      Tertulis "12+ platform", yang berfungsi baru 4 (TikTok, Instagram,
-      YouTube, Spotify). Sesuaikan teksnya atau tambah dukungan nyata.
+- [x] **A5 · `P1` · `S` · Klaim platform belum jujur.** — **selesai di v1.9.16**
+      Koreksi: ternyata scraper-nya **mendukung 6 platform** (TikTok, YouTube,
+      Instagram, Spotify, X, Pinterest) — yang mati hanya tombol X & Pinterest di
+      UI lama. Klaim "12+" dihapus, keenamnya sekarang tampil sebagai chip.
 
 - [ ] **A6 · `P1` · `M` · Isi kartu homescreen dengan info hidup.**
       Ardoro: sisa waktu timer. Artoolbox: chip alat favorit.

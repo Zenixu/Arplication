@@ -7,6 +7,34 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.16] - 2026-11-02
+
+# v1.9.16 — Enam platform, klaim "12+" dihapus
+
+## Koreksi penting
+Di v1.9.10 saya menyimpulkan X dan Pinterest **tidak didukung** karena tombolnya
+tidak punya aksi klik. Setelah memeriksa `src/services/scrapers/index.js`,
+ternyata **scraper-nya ada dan berfungsi**: `isXUrl`/`scrapeX` dan
+`isPinterestUrl`/`scrapePinterest`. Yang mati hanya tombol di UI lama. Kesimpulan
+sebelumnya salah dan sudah diperbaiki.
+
+## Perbaikan
+- **Keenam platform tampil sebagai chip bulat** (TikTok, Instagram, YouTube,
+  Spotify, X, Pinterest) — 44px per chip, keenamnya muat dalam satu baris di
+  layar 360px tanpa perlu digeser.
+- **Chip tidak lagi mengisi kolom dengan tautan contoh.** Dulu menekan chip
+  TikTok menempelkan URL video acak ke kolom input. Sekarang chip hanya
+  menampilkan baris petunjuk ("Pinterest — Contoh: https://…") dan langsung
+  memfokuskan kolom input.
+- **Klaim "12+" hilang.** Aplikasi tidak pernah punya 12 platform; yang ada 6.
+- **Pesan galat platform diterjemahkan** dan menyebut daftar yang benar:
+  "Platform belum didukung. Arloader bisa mengunduh dari TikTok, YouTube,
+  Instagram, Spotify, X, dan Pinterest."
+
+## Verifikasi
+Di 360px dan 390px: 6 chip, tepi kanan chip terakhir 320px < lebar layar —
+tidak terpotong, tidak perlu digeser.
+
 ## [1.9.15] - 2026-11-02
 
 # v1.9.15 — Cadangan menyertakan riwayat putar

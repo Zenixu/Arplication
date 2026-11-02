@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Clipboard, ArrowRight, X, Loader2, ListVideo, Link2 } from 'lucide-react';
 import { readClipboard } from '../../../utils/clipboard.js';
 
@@ -8,7 +8,13 @@ export function extractLinks(text = '') {
   return Array.from(new Set(cleaned.filter(Boolean)));
 }
 
-export default function UrlInput({ url, setUrl, onFetch, loading, elapsed = 0 }) {
+export default function UrlInput({ url, setUrl, onFetch, loading, elapsed = 0, hint = '' }) {
+  const areaRef = useRef(null);
+
+  // Saat pengguna mengetuk chip platform, fokuskan kolom input.
+  useEffect(() => {
+    if (hint) areaRef.current?.focus();
+  }, [hint]);
   const links = extractLinks(url);
   const isMulti = links.length > 1;
 
@@ -34,6 +40,7 @@ export default function UrlInput({ url, setUrl, onFetch, loading, elapsed = 0 })
         </div>
 
         <textarea
+          ref={areaRef}
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -64,6 +71,12 @@ export default function UrlInput({ url, setUrl, onFetch, loading, elapsed = 0 })
           </button>
         </div>
       </div>
+
+      {hint && (
+        <p className="text-[11px] font-mono-code font-bold text-[#121212]/55 px-1 leading-snug">
+          {hint}
+        </p>
+      )}
 
       {/* Multi-link Indicator Chip */}
       {isMulti && (

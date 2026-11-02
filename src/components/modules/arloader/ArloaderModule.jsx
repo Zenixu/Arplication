@@ -18,7 +18,20 @@ const PLATFORMS = [
   { id: 'instagram', name: 'Instagram', icon: 'instagram' },
   { id: 'youtube', name: 'YouTube', icon: 'youtube' },
   { id: 'spotify', name: 'Spotify', icon: 'spotify' },
+  { id: 'x', name: 'X', icon: 'x' },
+  { id: 'pinterest', name: 'Pinterest', icon: 'pinterest' },
 ];
+
+// Contoh tautan per platform — ditampilkan sebagai petunjuk, bukan ditempel
+// ke kolom input (dulu chip ini mengisi kolom dengan tautan contoh).
+const PLATFORM_HINTS = {
+  tiktok: 'Contoh: https://www.tiktok.com/@nama/video/1234567890',
+  instagram: 'Contoh: https://instagram.com/reel/C8xyz123',
+  youtube: 'Contoh: https://www.youtube.com/watch?v=xxxxxxxxxxx',
+  spotify: 'Contoh: https://open.spotify.com/album/xxxxxxxx',
+  x: 'Contoh: https://x.com/nama/status/1234567890',
+  pinterest: 'Contoh: https://id.pinterest.com/pin/1234567890/',
+};
 import { getDownloadSettings } from '../../../utils/download.js';
 import { getDownloadHistory, addDownloadRecord } from '../../../utils/history.js';
 import { readClipboard } from '../../../utils/clipboard.js';
@@ -35,6 +48,7 @@ export default function ArloaderModule({ setActiveTab }) {
   const [currentSettings, setCurrentSettings] = useState(getDownloadSettings());
   const [clipSuggestion, setClipSuggestion] = useState('');
   const [elapsed, setElapsed] = useState(0);
+  const [platformHint, setPlatformHint] = useState('');
   const resultRef = useRef(null);
 
   // Queue state for multi-link batch extraction
@@ -159,22 +173,8 @@ export default function ArloaderModule({ setActiveTab }) {
   };
 
   const handleSelectPlatform = (platform) => {
-    switch (platform) {
-      case 'tiktok':
-        setUrl('https://www.tiktok.com/@creative_artist/video/73291823910');
-        break;
-      case 'instagram':
-        setUrl('https://instagram.com/reel/C8xyz123');
-        break;
-      case 'youtube':
-        setUrl('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-        break;
-      case 'spotify':
-        setUrl('https://open.spotify.com/album/2noRn2Aes5aoNVsU6iWThc');
-        break;
-      default:
-        break;
-    }
+    const nama = PLATFORMS.find((x) => x.id === platform)?.name || '';
+    setPlatformHint(nama ? `${nama} — ${PLATFORM_HINTS[platform] || ''}` : '');
   };
 
   const sub = String(currentSettings.subfolder || '').trim().replace(/^\/+|\/+$/g, '');
@@ -235,6 +235,7 @@ export default function ArloaderModule({ setActiveTab }) {
           onFetch={handleFetch}
           loading={loading}
           elapsed={elapsed}
+          hint={platformHint}
         />
 
         <button
@@ -274,18 +275,16 @@ export default function ArloaderModule({ setActiveTab }) {
             <button
               key={plat.id}
               onClick={() => handleSelectPlatform(plat.id)}
-              title={"Tempel link " + plat.name}
-              className="shrink-0 flex items-center gap-1.5 pl-1 pr-2.5 py-1 bg-white border-2 border-black rounded-full shadow-[2px_2px_0px_#121212] active:translate-y-0.5 active:shadow-[1px_1px_0px_#121212] transition-all"
+              title={`Tempel link ${plat.name}`}
+              aria-label={`Contoh link ${plat.name}`}
+              className="shrink-0 w-11 h-11 bg-white border-2 border-black rounded-full shadow-[2px_2px_0px_#121212] flex items-center justify-center active:translate-y-0.5 active:shadow-[1px_1px_0px_#121212] transition-all"
             >
-              <span className="w-6 h-6 rounded-full bg-[#F8F5EE] border border-black flex items-center justify-center overflow-hidden p-1 shrink-0">
-                <img
-                  src={"/platforms/" + plat.icon + ".svg"}
-                  alt={plat.name}
-                  className="w-full h-full object-contain"
-                  loading="lazy"
-                />
-              </span>
-              <span className="font-black text-[10px] uppercase">{plat.name}</span>
+              <img
+                src={"/platforms/" + plat.icon + ".svg"}
+                alt={plat.name}
+                className="w-6 h-6 object-contain"
+                loading="lazy"
+              />
             </button>
           ))}
         </div>
