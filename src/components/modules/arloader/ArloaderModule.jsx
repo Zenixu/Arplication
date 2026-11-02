@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   AlertCircle, Settings, Folder, History, Trash2,
   Sparkles, Layers, Download, CheckCircle2, RotateCcw, Loader2,
-  HardDrive, ShieldCheck, Activity, Home
+  HardDrive, ShieldCheck, Activity, Home, Clock
 } from 'lucide-react';
 import UrlInput, { extractLinks } from './UrlInput.jsx';
 import MediaCard from './MediaCard.jsx';
@@ -19,7 +19,7 @@ const PLATFORMS = [
   { id: 'youtube', name: 'YouTube', icon: 'youtube' },
   { id: 'spotify', name: 'Spotify', icon: 'spotify' },
 ];
-import { getDownloadSettings, formatFileSize } from '../../../utils/download.js';
+import { getDownloadSettings } from '../../../utils/download.js';
 import { getDownloadHistory, addDownloadRecord } from '../../../utils/history.js';
 import { readClipboard } from '../../../utils/clipboard.js';
 import { APP_VERSION } from '../../../services/updater.js';
@@ -152,11 +152,6 @@ export default function ArloaderModule({ setActiveTab }) {
   const sub = String(currentSettings.subfolder || '').trim().replace(/^\/+|\/+$/g, '');
   const dirLabel = currentSettings.directory === 'Documents' ? 'Documents' : 'Download';
   const folderBadgeText = sub ? `${dirLabel}/${sub}` : dirLabel;
-
-  // Calculate total download stats for Bento summary
-  const totalDownloads = downloads.length;
-  const estimatedBytes = totalDownloads * 12 * 1024 * 1024; // approx 12MB average
-  const formattedStorage = formatFileSize(estimatedBytes);
 
   return (
     <div className="space-y-4 pb-28 pt-1 text-[#121212] font-sans">
@@ -342,40 +337,16 @@ export default function ArloaderModule({ setActiveTab }) {
       {/* Download History */}
       <DownloadHistory items={downloads} onChange={setDownloads} setActiveTab={setActiveTab} />
 
-      {/* SECTION: PIPELINE STATUS SUMMARY CARD (Di paling bawah) */}
-      <div className="nb-card p-3 bg-white space-y-2 shadow-[3px_3px_0px_#121212]">
-        <div className="flex items-center justify-between border-b-2 border-black pb-2">
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-[#38E54D] border border-black animate-pulse" />
-            <h4 className="font-mono-code font-extrabold text-xs text-[#121212] uppercase tracking-wide">
-              ANTREAN UNDUHAN
-            </h4>
-          </div>
-          <div className="flex items-center gap-1.5 font-mono-code text-[11px] font-black">
-            <span className="bg-[#38E54D] text-black px-1.5 py-0.5 border border-black rounded shadow-[1px_1px_0px_#121212]">
-              {totalDownloads} DONE
-            </span>
-            <span className="bg-[#FFE600] text-black px-1.5 py-0.5 border border-black rounded shadow-[1px_1px_0px_#121212]">
-              {queue.length > 0 ? `${queue.length} QUEUED` : 'IDLE'}
-            </span>
-          </div>
+      {downloads.length === 0 && (
+        <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white border-2 border-dashed border-black/25 rounded-xl">
+          <span className="w-7 h-7 shrink-0 rounded-lg bg-[#F8F5EE] border-2 border-black/25 flex items-center justify-center">
+            <Clock className="w-3.5 h-3.5 text-[#121212]/50" />
+          </span>
+          <p className="text-[11px] font-mono-code font-bold text-[#121212]/55 leading-snug">
+            Belum ada unduhan. Hasilnya akan muncul di sini.
+          </p>
         </div>
-
-        <div className="grid grid-cols-3 gap-2 text-center">
-          <div className="bg-[#F8F5EE] border-2 border-black rounded-xl p-2 shadow-[1.5px_1.5px_0px_#121212]">
-            <div className="text-[11px] font-mono-code font-black text-gray-600 uppercase">Downloads</div>
-            <div className="text-sm font-black text-[#121212] mt-0.5">{totalDownloads}</div>
-          </div>
-          <div className="bg-[#F8F5EE] border-2 border-black rounded-xl p-2 shadow-[1.5px_1.5px_0px_#121212]">
-            <div className="text-[11px] font-mono-code font-black text-gray-600 uppercase">Est. Storage</div>
-            <div className="text-sm font-black text-[#121212] mt-0.5">{formattedStorage}</div>
-          </div>
-          <div className="bg-[#F8F5EE] border-2 border-black rounded-xl p-2 shadow-[1.5px_1.5px_0px_#121212]">
-            <div className="text-[11px] font-mono-code font-black text-gray-600 uppercase">Sandbox</div>
-            <div className="text-sm font-black text-emerald-800 mt-0.5">100%</div>
-          </div>
-        </div>
-      </div>
+      )}
 
       {/* Settings Modal */}
       <DownloadSettingsModal

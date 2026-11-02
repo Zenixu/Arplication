@@ -27,7 +27,7 @@ Satu item = satu perubahan yang bisa dirilis sendiri.
       87 elemen memakai 8–9,5px. Naikkan minimum ke 11px, teks utama 13–14px.
       *Alasan:* di HP, 8px ≈ 2,1 mm — di bawah batas nyaman baca.
 
-- [ ] **A2 · `P0` · `S` · Kartu "PIPELINE STATUS" di Arloader.**
+- [x] **A2 · `P0` · `S` · Kartu "PIPELINE STATUS" di Arloader.** — **selesai di v1.9.12**
       Isinya `0 DONE / IDLE` dan `SANDBOX 100%` — istilah teknis yang tidak
       menjelaskan apa pun ke pengguna. Ganti jadi ringkasan berguna atau hapus.
 

@@ -7,6 +7,28 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.12] - 2026-11-02
+
+# v1.9.12 — Kartu "Pipeline Status" dihapus
+
+## Perbaikan
+- **Kartu "ANTREAN UNDUHAN / PIPELINE STATUS" di bawah halaman Arloader dihapus.**
+  Kartu itu menampilkan tiga hal yang bermasalah:
+  - `SANDBOX 100%` — tidak ada artinya; aplikasi tidak memakai sandbox.
+  - `EST. STORAGE` — **angka karangan**: jumlah unduhan dikali 12 MB, bukan
+    ukuran file sebenarnya.
+  - `DOWNLOADS` + `0 DONE` — mengulang jumlah yang sudah tertulis di judul
+    kartu Riwayat Unduhan.
+- **Ditambah keterangan saat riwayat masih kosong:** "Belum ada unduhan.
+  Hasilnya akan muncul di sini." — supaya halaman tidak terasa kosong sebelum
+  ada unduhan pertama.
+- Kode perhitungan `estimatedBytes` dan impor `formatFileSize` yang tidak dipakai
+  lagi ikut dibersihkan.
+
+## Catatan
+Antrean multi-link tetap punya panelnya sendiri ("Antrean Multi-Link 2/5") yang
+menampilkan progres nyata, jadi tidak ada informasi yang hilang.
+
 ## [1.9.11] - 2026-11-02
 
 # v1.9.11 — Teks lebih mudah dibaca
