@@ -344,58 +344,6 @@ export default function DownloadSettingsModal({ isOpen, onClose }) {
           )}
         </div>
 
-        {/* 5. Informasi Pembuat & Kontak */}
-        <div className="nb-card p-3.5 bg-white space-y-2.5 shadow-[2.5px_2.5px_0px_#121212]">
-          <div>
-            <label className="font-mono-code font-black text-xs text-[#121212] uppercase tracking-wide block">
-              5. Informasi Pembuat & Kontak
-            </label>
-            <p className="text-[11px] font-medium text-gray-600 mt-0.5 leading-relaxed">
-              Hubungi pengembang atau ikuti kanal resmi Aruthtale:
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-2 text-xs font-mono-code">
-            <a
-              href="https://github.com/Aruthtale"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="nb-btn p-2 bg-[#FFE600] text-[#121212] flex items-center gap-2 no-underline text-[11px]"
-            >
-              <span className="font-black">GitHub:</span>
-              <span className="truncate">@Aruthtale</span>
-            </a>
-
-            <a
-              href="https://instagram.com/aruthtale"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="nb-btn p-2 bg-[#FF70A6] text-[#121212] flex items-center gap-2 no-underline text-[11px]"
-            >
-              <span className="font-black">Instagram:</span>
-              <span className="truncate">@aruthtale</span>
-            </a>
-
-            <a
-              href="https://www.tiktok.com/@aruthtale"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="nb-btn p-2 bg-[#C4FAF8] text-[#121212] flex items-center gap-2 no-underline text-[11px]"
-            >
-              <span className="font-black">TikTok:</span>
-              <span className="truncate">@aruthtale</span>
-            </a>
-
-            <a
-              href="mailto:aruthtale@gmail.com"
-              className="nb-btn p-2 bg-white text-[#121212] flex items-center gap-2 no-underline text-[11px]"
-            >
-              <span className="font-black">Email:</span>
-              <span className="truncate">aruthtale@gmail.com</span>
-            </a>
-          </div>
-        </div>
-
         {/* Action Buttons */}
         <div className="pt-2 flex items-center justify-between gap-3">
           <button

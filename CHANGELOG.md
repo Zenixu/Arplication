@@ -7,6 +7,30 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.10] - 2026-11-02
+
+# v1.9.10 — Arloader dirapikan
+
+## Perbaikan
+- **Tombol "Hub" di halaman Arloader dihapus.** Bottom nav sudah punya HUB, jadi
+  tombol itu hanya mengulang.
+- **Dua tombol pengaturan digabung jadi satu.** Sebelumnya ada tombol folder dan
+  tombol gear yang ternyata membuka modal yang sama — membingungkan pengguna baru.
+  Sekarang satu tombol **Pengaturan**, dan folder tujuan tampil sebagai baris
+  "Simpan ke: …" di dalam kartu input (bisa diketuk untuk mengubah).
+- **Badge "BETA" dihapus** dari halaman Arloader.
+- **Informasi pembuat & kontak dihapus dari modal pengaturan** — sudah ada di
+  modul Aruthtale. Modal sekarang berisi 4 bagian: folder utama, subfolder,
+  format penamaan, dan Instagram Session ID.
+- **Bagian platform dipadatkan.** Dulu 6 kartu dalam 2 kolom (6 baris) dengan
+  label dan tag format. Sekarang satu baris chip berisi logo asli tiap platform
+  (TikTok, Instagram, YouTube, Spotify) yang bisa digeser ke samping.
+
+## Teknis
+- Logo platform diambil dari **simple-icons** (open source) dan disimpan lokal di
+  `public/platforms/*.svg` — jadi tetap tampil tanpa internet, tidak mengambil
+  gambar dari server saat aplikasi dipakai.
+
 ## [1.9.9] - 2026-11-02
 
 # v1.9.9 — Tiga gaya kartu di bagian Alat

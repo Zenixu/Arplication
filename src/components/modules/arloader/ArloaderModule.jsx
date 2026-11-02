@@ -10,6 +10,15 @@ import DownloadHistory from './DownloadHistory.jsx';
 import DownloadSettingsModal from './DownloadSettingsModal.jsx';
 import { scrapeMedia } from '../../../services/scrapers/index.js';
 import { loadScraperHistory, saveScraperHistory, clearScraperHistory } from '../../../utils/history.js';
+
+// Logo platform dari simple-icons (open source), disimpan lokal di
+// public/platforms/*.svg supaya tetap tampil tanpa internet.
+const PLATFORMS = [
+  { id: 'tiktok', name: 'TikTok', icon: 'tiktok' },
+  { id: 'instagram', name: 'Instagram', icon: 'instagram' },
+  { id: 'youtube', name: 'YouTube', icon: 'youtube' },
+  { id: 'spotify', name: 'Spotify', icon: 'spotify' },
+];
 import { getDownloadSettings, formatFileSize } from '../../../utils/download.js';
 import { getDownloadHistory, addDownloadRecord } from '../../../utils/history.js';
 import { readClipboard } from '../../../utils/clipboard.js';
@@ -157,40 +166,26 @@ export default function ArloaderModule({ setActiveTab }) {
         <div className="absolute top-48 left-1 text-[10px] opacity-35 select-none pointer-events-none text-[#FF70A6]">🌸</div>
       </div>
 
-      {/* Module Top Bar */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={() => setActiveTab('home')}
-          className="nb-btn px-3 py-1.5 bg-white text-[#121212] text-xs flex items-center gap-1.5 shadow-[2px_2px_0px_#121212]"
-          title="Kembali ke Hub Utama"
-        >
-          <Home className="w-3.5 h-3.5" />
-          <span>Hub</span>
-        </button>
-
-        <div className="flex items-center gap-2">
-          {/* Storage folder button */}
-          <button
-            onClick={() => setIsSettingsOpen(true)}
-            className="nb-btn px-2.5 py-1.5 bg-white text-[#121212] text-[11px] font-mono-code font-bold flex items-center gap-1.5 shadow-[2px_2px_0px_#121212]"
-            title="Ubah Folder Penyimpanan"
-          >
-            <Folder className="w-3.5 h-3.5 text-[#121212]" />
-            <span className="truncate max-w-[120px]">{folderBadgeText}</span>
-          </button>
-
-          <button
-            onClick={() => setIsSettingsOpen(true)}
-            className="nb-btn w-8 h-8 bg-white p-0 flex items-center justify-center text-[#121212] shadow-[2px_2px_0px_#121212]"
-            title="Pengaturan Download"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-
-          <span className="text-[10px] font-mono-code font-black bg-[#38E54D] text-[#121212] px-2 py-1 rounded border-2 border-black shadow-[1.5px_1.5px_0px_#121212]">
-            BETA
-          </span>
+      {/* Module Top Bar — satu tombol pengaturan saja (folder + opsi jadi satu) */}
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-7 h-7 bg-[#FFE600] rounded-lg border border-black flex items-center justify-center shadow-[1px_1px_0px_#121212] overflow-hidden p-0.5 shrink-0">
+            <img src="/arloader.png" alt="Arloader" className="w-full h-full object-contain" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[11px] font-black uppercase leading-none">Arloader</p>
+            <p className="text-[9px] font-mono-code font-bold text-gray-500 truncate">Unduh media</p>
+          </div>
         </div>
+
+        <button
+          onClick={() => setIsSettingsOpen(true)}
+          className="nb-btn px-2.5 py-1.5 bg-white text-[#121212] text-[11px] font-mono-code font-bold flex items-center gap-1.5 shadow-[2px_2px_0px_#121212] shrink-0"
+          title="Pengaturan unduhan & folder"
+        >
+          <Settings className="w-3.5 h-3.5 text-[#121212]" />
+          <span>Pengaturan</span>
+        </button>
       </div>
 
       {/* SECTION: Neubrutalist Bento Input Box */}
@@ -218,6 +213,18 @@ export default function ArloaderModule({ setActiveTab }) {
           loading={loading}
         />
 
+        <button
+          onClick={() => setIsSettingsOpen(true)}
+          className="w-full flex items-center justify-between gap-2 text-[10px] font-mono-code font-bold text-gray-600 bg-[#F8F5EE] border border-black rounded-lg px-2 py-1.5"
+          title="Ubah folder penyimpanan"
+        >
+          <span className="flex items-center gap-1.5 min-w-0">
+            <Folder className="w-3 h-3 shrink-0 text-[#121212]" />
+            <span className="truncate">Simpan ke: {folderBadgeText}</span>
+          </span>
+          <span className="underline shrink-0 text-[#121212]">ubah</span>
+        </button>
+
         {/* Error notification */}
         {error && (
           <div className="p-2.5 rounded-xl bg-[#FF6B6B]/15 border-2 border-black shadow-[2px_2px_0px_#121212] flex items-start gap-2 text-xs font-bold text-red-900">
@@ -227,108 +234,36 @@ export default function ArloaderModule({ setActiveTab }) {
         )}
       </div>
 
-      {/* SECTION: SUPPORTED PLATFORMS BENTO GRID */}
+      {/* SECTION: PLATFORM STRIP — ringkas, satu baris logo */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1.5">
-            <h3 className="font-mono-code font-black text-[11px] text-[#121212] uppercase tracking-wider">
-              SUPPORTED PLATFORMS
-            </h3>
-            <span className="text-[9px] font-mono-code text-gray-500 font-bold">(12+)</span>
-          </div>
+          <h3 className="font-mono-code font-black text-[11px] text-[#121212] uppercase tracking-wider">
+            Platform
+          </h3>
           <span className="font-mono-code text-[9px] font-bold text-gray-600 bg-white px-1.5 py-0.5 border border-black rounded shadow-[1px_1px_0px_#121212]">
             AUTO DETECT
           </span>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          {/* TikTok */}
-          <div 
-            onClick={() => handleSelectPlatform('tiktok')}
-            className="bg-white border-2 border-black rounded-xl p-2 px-2.5 shadow-[2px_2px_0px_#121212] flex items-center justify-between group cursor-pointer hover:bg-[#F8F5EE] transition-all"
-          >
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-[#121212] rounded-lg border border-black flex items-center justify-center text-[#38E54D] font-black text-[10px]">
-                TT
-              </div>
-              <span className="font-black text-[11.5px] text-[#121212]">TIKTOK</span>
-            </div>
-            <span className="text-[9px] font-mono-code font-bold text-emerald-800 bg-[#38E54D]/20 px-1 rounded border border-black">
-              HD
-            </span>
-          </div>
-
-          {/* Instagram */}
-          <div 
-            onClick={() => handleSelectPlatform('instagram')}
-            className="bg-white border-2 border-black rounded-xl p-2 px-2.5 shadow-[2px_2px_0px_#121212] flex items-center justify-between group cursor-pointer hover:bg-[#F8F5EE] transition-all"
-          >
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-[#FF70A6] rounded-lg border border-black flex items-center justify-center text-white font-black text-[10px]">
-                IG
-              </div>
-              <span className="font-black text-[11.5px] text-[#121212]">INSTAGRAM</span>
-            </div>
-            <span className="text-[9px] font-mono-code font-bold text-gray-600 bg-gray-100 px-1 rounded border border-black">
-              REEL
-            </span>
-          </div>
-
-          {/* YouTube */}
-          <div 
-            onClick={() => handleSelectPlatform('youtube')}
-            className="bg-white border-2 border-black rounded-xl p-2 px-2.5 shadow-[2px_2px_0px_#121212] flex items-center justify-between group cursor-pointer hover:bg-[#F8F5EE] transition-all"
-          >
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-[#FF525E] rounded-lg border border-black flex items-center justify-center text-white font-black text-[10px]">
-                YT
-              </div>
-              <span className="font-black text-[11.5px] text-[#121212]">YOUTUBE</span>
-            </div>
-            <span className="text-[9px] font-mono-code font-bold text-purple-900 bg-[#E7DBFF] px-1 rounded border border-black">
-              4K / MP3
-            </span>
-          </div>
-
-          {/* Spotify */}
-          <div 
-            onClick={() => handleSelectPlatform('spotify')}
-            className="bg-white border-2 border-black rounded-xl p-2 px-2.5 shadow-[2px_2px_0px_#121212] flex items-center justify-between group cursor-pointer hover:bg-[#F8F5EE] transition-all"
-          >
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-[#1DB954] rounded-lg border border-black flex items-center justify-center text-black font-black text-[10px]">
-                SP
-              </div>
-              <span className="font-black text-[11.5px] text-[#121212]">SPOTIFY</span>
-            </div>
-            <span className="text-[9px] font-mono-code font-bold text-black bg-[#FFE600] px-1 rounded border border-black">
-              ALBUM
-            </span>
-          </div>
-
-          {/* Twitter / X */}
-          <div className="bg-white border-2 border-black rounded-xl p-2 px-2.5 shadow-[2px_2px_0px_#121212] flex items-center justify-between group cursor-pointer hover:bg-[#F8F5EE] transition-all">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-[#121212] rounded-lg border border-black flex items-center justify-center text-white font-mono-code font-bold text-[10px]">
-                X
-              </div>
-              <span className="font-black text-[11.5px] text-[#121212]">TWITTER</span>
-            </div>
-            <span className="text-[9px] font-mono-code font-bold text-gray-500">VIDEO</span>
-          </div>
-
-          {/* Pinterest */}
-          <div className="bg-white border-2 border-black rounded-xl p-2 px-2.5 shadow-[2px_2px_0px_#121212] flex items-center justify-between group cursor-pointer hover:bg-[#F8F5EE] transition-all">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 bg-[#E11D48] rounded-lg border border-black flex items-center justify-center text-white font-black text-[10px]">
-                PIN
-              </div>
-              <span className="font-black text-[11.5px] text-[#121212]">PINTEREST</span>
-            </div>
-            <span className="text-[9px] font-mono-code font-bold text-rose-800 bg-rose-100 px-1 rounded border border-black">
-              MEDIA
-            </span>
-          </div>
+        <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {PLATFORMS.map((plat) => (
+            <button
+              key={plat.id}
+              onClick={() => handleSelectPlatform(plat.id)}
+              title={"Tempel link " + plat.name}
+              className="shrink-0 flex items-center gap-1.5 pl-1 pr-2.5 py-1 bg-white border-2 border-black rounded-full shadow-[2px_2px_0px_#121212] active:translate-y-0.5 active:shadow-[1px_1px_0px_#121212] transition-all"
+            >
+              <span className="w-6 h-6 rounded-full bg-[#F8F5EE] border border-black flex items-center justify-center overflow-hidden p-1 shrink-0">
+                <img
+                  src={"/platforms/" + plat.icon + ".svg"}
+                  alt={plat.name}
+                  className="w-full h-full object-contain"
+                  loading="lazy"
+                />
+              </span>
+              <span className="font-black text-[10px] uppercase">{plat.name}</span>
+            </button>
+          ))}
         </div>
       </div>
 
