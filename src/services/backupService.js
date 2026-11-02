@@ -24,6 +24,7 @@ export const BACKUP_LOCAL_KEYS = [
   // ArMusic
   'armusic_library',
   'armusic_playlists',
+  'armusic_recent_plays',
   'armusic_lyrics_cache',
   'yt_music_recent_searches',
   // Ardoro

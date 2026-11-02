@@ -74,7 +74,7 @@ export default function AppSettingsModal({ isOpen, onClose }) {
       const s = res.summary;
       setBackupStatus({
         type: 'ok',
-        msg: `Cadangan dibuat: ${res.filename} (${s.keys} kunci, ${s.notes} catatan, ${formatBytes(s.bytes)}).`,
+        msg: `Cadangan dibuat: ${res.filename} (${s.keys} kunci, ${s.notes} catatan, ${formatBytes(s.bytes)}). Tersimpan di folder Download/Aruthtale/Backup.`,
       });
     } catch (err) {
       setBackupStatus({ type: 'error', msg: `Gagal membuat cadangan: ${err?.message || err}` });

@@ -77,9 +77,11 @@ Satu item = satu perubahan yang bisa dirilis sendiri.
       (3) cara memutar musik. Pengguna awam tidak akan menemukan sendiri bahwa
       ArMusic butuh lagu dari Arloader lebih dulu.
 
-- [ ] **B4 · `P1` · `S` · Backup & restore belum bisa diakses.**
-      `backupService.js` sudah ada tetapi tidak muncul di UI. Penting: koleksi
-      lagu & catatan hilang kalau ganti HP.
+- [x] **B4 · `P1` · `S` · Backup & restore.** — **selesai di v1.9.15**
+      Ternyata **sudah ada** di Pengaturan (tombol Cadangkan & Pulihkan, lengkap
+      dengan konfirmasi dan opsi menyertakan token login). Yang kurang: kunci
+      `armusic_recent_plays` belum ikut tercadang, dan pesan sukses tidak
+      menyebutkan di mana file disimpan.
 
 - [ ] **B5 · `P1` · `M` · Antrean unduhan multi-link.**
       Kode antrean sudah ada di Arloader, tetapi belum menampilkan progres

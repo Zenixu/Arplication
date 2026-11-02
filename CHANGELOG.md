@@ -7,6 +7,32 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.15] - 2026-11-02
+
+# v1.9.15 — Cadangan menyertakan riwayat putar
+
+## Catatan penting
+Fitur cadangkan & pulihkan ternyata **sudah ada** di Pengaturan sejak
+sebelumnya — lengkap dengan tombol Cadangkan/Pulihkan, konfirmasi sebelum
+menimpa data, dan opsi menyertakan token YouTube Music. Jadi bukan dibuat baru.
+
+## Yang diperbaiki
+- **`armusic_recent_plays` belum ikut tercadang.** Kunci ini menyimpan riwayat
+  "Terakhir diputar" di homescreen (dipakai sejak v1.9.8). Akibatnya setelah
+  memulihkan cadangan di HP baru, koleksi kembali tetapi riwayat putar kosong.
+  Sekarang ikut.
+- **Pesan sukses menyebutkan lokasi file.** Dulu hanya "Cadangan dibuat:
+  arplication-backup-….json (…)". Sekarang ditambah
+  "Tersimpan di folder Download/Aruthtale/Backup." — supaya pengguna tahu
+  harus mencari ke mana.
+
+## Verifikasi
+- Uji cadangan nyata di browser: menghasilkan 2 kunci dari 2 data yang disiapkan
+  (`armusic_library` + `armusic_recent_plays`), artinya kunci baru benar-benar
+  ikut.
+- Uji fungsi `parseBackupText` / `validateBackup` / `summarizeBackup` lewat Node:
+  file cadangan terbaca, tervalidasi, dan ringkasannya benar.
+
 ## [1.9.14] - 2026-11-02
 
 # v1.9.14 — Alur unduh Arloader lebih jelas
