@@ -7,6 +7,30 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.4] - 2026-11-02
+
+# v1.9.4 — Tanpa server
+
+## Baru
+- **Ekstraksi audio langsung di HP.** APK kini membawa NewPipeExtractor
+  (v0.26.5) dan mengekstrak URL audio sendiri lewat OkHttp — tidak ada
+  laptop, VPS, atau server yt-dlp yang harus menyala. Diukur di perangkat
+  uji: ~3,3 detik per lagu, audio/webm 160 kbps.
+- **Pencarian di perangkat.** Tab Cari kini mencari langsung di HP
+  (~0,6-1 detik, 20 hasil) sebelum menyentuh Innertube/Piped yang sudah mati.
+- **Penanda di tab Cari**: "Ekstraksi audio berjalan di HP ini — tanpa server".
+
+## Berubah
+- Server yt-dlp sekarang **opsional** — hanya cadangan kalau ekstraksi
+  di perangkat gagal (mis. video dibatasi YouTube).
+- Pesan galat membedakan tiga sebab: ekstraksi perangkat gagal, server tidak
+  merespons, atau tidak ada sumber sama sekali.
+- Ukuran APK 14,5 MB -> 16,4 MB (NewPipeExtractor + Rhino + protobuf).
+
+## Catatan
+- Kalau YouTube mengubah sesuatu dan pemutaran mulai gagal, perbaikannya
+  adalah menaikkan versi NewPipeExtractor lalu merilis APK baru.
+
 ## [1.9.3] - 2026-11-02
 
 # v1.9.3 — Pemutaran jalan lagi

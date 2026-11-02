@@ -21,6 +21,8 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        // NewPipeExtractor (ekstraksi audio YouTube di dalam APK, tanpa server)
+        maven { url 'https://jitpack.io' }
     }
 }
 

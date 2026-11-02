@@ -4,6 +4,7 @@ import {
   Clock, User, Sparkles, CheckCircle,
 } from 'lucide-react';
 import { searchYouTubeMusic, resolveYouTubeMusicAudioUrl } from '../../../services/musicStream.js';
+import { isDeviceExtractorAvailable } from '../../../services/armusicExtractor.js';
 import { isBotBlockError, formatResolverError } from '../../../services/scrapers/youtube.js';
 import { downloadMedia } from '../../../utils/download.js';
 import { addDownloadRecord } from '../../../utils/history.js';
@@ -243,6 +244,7 @@ export default function YTMusicSearchView({ playTrack, onDownload, currentId, pl
   // ============ RENDER ============
 
   const renderSearchBar = () => (
+    <>
     <div className="flex items-center gap-2 bg-white rounded-xl border-2 border-[#121212] shadow-[2px_2px_0px_#121212] px-3 py-2">
       <Search className="w-4 h-4 text-[#121212] shrink-0" />
       <input
@@ -266,6 +268,12 @@ export default function YTMusicSearchView({ playTrack, onDownload, currentId, pl
         {searching ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Cari'}
       </button>
     </div>
+    {isDeviceExtractorAvailable() && (
+      <p className="text-[10px] font-mono-code text-gray-500 px-1 mt-1.5">
+        Ekstraksi audio berjalan di HP ini — tanpa server
+      </p>
+    )}
+    </>
   );
 
   const renderRecentSearches = () => {

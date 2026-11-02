@@ -3,6 +3,7 @@ import {
   resolveYouTubeAudioUrl as youtubeResolveAudioUrl,
 } from './scrapers/youtube.js';
 import { pickYouTubeMusicAudioUrl, searchYouTubeMusic } from './scrapers/youtubeMusic.js';
+import { extractAudioOnDevice, isDeviceExtractorAvailable } from './armusicExtractor.js';
 
 // Priority: 1) Innertube direct (fastest for YouTube Music), 2) Piped (already exists), 3) Convert1s, 4) yt-dlp remote, 5) yt-dlp local
 
@@ -191,6 +192,17 @@ export async function resolveYouTubeMusicAudioUrl({
 
   const layers = [
     {
+      // Ekstraksi langsung di HP lewat NewPipeExtractor: tidak butuh server sama sekali.
+      name: 'device',
+      ms: 30000,
+      when: () => isDeviceExtractorAvailable(),
+      run: async () => {
+        if (onProgress) onProgress(35, 'Mengekstrak di perangkat...');
+        const result = await extractAudioOnDevice(vid);
+        return result?.url || null;
+      },
+    },
+    {
       name: 'ytdlp-remote',
       ms: 25000,
       when: () => Boolean(serverUrl) && isNative(),
@@ -235,9 +247,17 @@ export async function resolveYouTubeMusicAudioUrl({
     }
   }
 
-  const hint = serverUrl
-    ? 'Server yt-dlp tidak merespons. Periksa apakah server masih jalan dan bisa dijangkau dari HP.'
-    : 'Belum ada server yt-dlp yang diatur. Buka Pengaturan -> URL yt-dlp server, lalu isi alamat server yt-dlp kamu.';
+  const deviceTried = isDeviceExtractorAvailable();
+  let hint;
+  if (deviceTried && serverUrl) {
+    hint = 'Ekstraksi di perangkat dan server yt-dlp sama-sama gagal. Coba lagi, atau periksa koneksi internet.';
+  } else if (deviceTried) {
+    hint = 'Ekstraksi di perangkat gagal. Coba lagi sebentar lagi — kalau tetap gagal, video ini mungkin dibatasi YouTube.';
+  } else if (serverUrl) {
+    hint = 'Server yt-dlp tidak merespons. Periksa apakah server masih jalan dan bisa dijangkau dari HP.';
+  } else {
+    hint = 'Tidak ada sumber audio yang tersedia di perangkat ini.';
+  }
   throw new Error(
     `Tidak bisa memutar lagu ini. ${hint}${lastError ? ` (${lastError.message})` : ''}`,
   );

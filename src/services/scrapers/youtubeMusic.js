@@ -1,4 +1,5 @@
 import { httpClient, isLocalWeb, isNative } from '../http.js';
+import { searchOnDevice } from '../armusicExtractor.js';
 import { PIPED_API_INSTANCES, pipedGet, pipedSearchVideos, pipedGetStreams, pickPipedAudioUrl, isBotBlockError, formatResolverError } from './youtube.js';
 
 /**
@@ -234,6 +235,27 @@ export async function searchYouTubeMusic(query = '', limit = 20) {
   if (!q) return [];
 
   let lastError = null;
+
+  // 0) Pencarian di perangkat (NewPipeExtractor) — tanpa server, ~1 detik.
+  if (isNative()) {
+    try {
+      const deviceResults = await searchOnDevice(q, limit);
+      if (deviceResults.length) {
+        return deviceResults.map((r) => ({
+          videoId: r.videoId,
+          title: r.title,
+          artist: r.artist,
+          duration: r.duration,
+          durationFormatted: r.duration ? formatDuration(r.duration) : null,
+          cover: r.cover,
+          platform: 'youtube_music',
+          source: 'device',
+        }));
+      }
+    } catch (deviceErr) {
+      console.warn('[YouTube Music] pencarian di perangkat gagal:', deviceErr?.message || deviceErr);
+    }
+  }
 
   for (const endpoint of INNERTUBE_ENDPOINTS) {
     try {
