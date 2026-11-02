@@ -353,8 +353,57 @@ export default function YTMusicSearchView({ playTrack, onDownload, currentId, pl
   };
 
   const renderResults = () => (
-    <div className="space-y-2 max-h-[480px] overflow-y-auto pr-1">
-      {results.map((track) => {
+    <div className="space-y-2">
+      {/* Hasil teratas — fokus utama seperti layout Spotify */}
+      {results[0] && (() => {
+        const top = results[0];
+        const topPlaying = isTrackPlaying(top.videoId);
+        return (
+          <div className="relative">
+            <div className="absolute inset-0 translate-x-1 translate-y-1 rounded-2xl bg-[#121212]" aria-hidden="true" />
+            <div
+              onClick={() => handlePlay(top)}
+              className="relative nb-card p-3 flex items-center gap-3 cursor-pointer bg-white"
+            >
+              <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-black bg-[#FFE600] shrink-0 flex items-center justify-center">
+                {top.cover ? (
+                  <img src={top.cover} alt={top.title} className="w-full h-full object-cover" loading="lazy" />
+                ) : (
+                  <Music className="w-6 h-6 text-[#121212]" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[9px] font-mono-code font-black text-gray-500 uppercase tracking-wide">Hasil teratas</p>
+                <p className="text-sm font-black truncate leading-tight">{top.title}</p>
+                <p className="text-[10px] font-mono-code font-bold text-gray-500 truncate">
+                  {top.artist}{top.durationFormatted ? ` • ${top.durationFormatted}` : ''}
+                </p>
+                <span className="inline-block mt-1 text-[8px] font-mono-code font-black px-1.5 py-0.5 rounded border border-black bg-[#C6F24E]">
+                  LAGU
+                </span>
+              </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); handlePlay(top); }}
+                className={`w-11 h-11 rounded-full border-2 border-black shadow-[2px_2px_0_#121212] flex items-center justify-center shrink-0 ${topPlaying ? 'bg-[#121212] text-[#FFE600]' : 'bg-[#C6F24E] text-[#121212]'}`}
+                aria-label={topPlaying ? 'Sedang diputar' : 'Putar'}
+              >
+                {resolvingId === top.videoId ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : topPlaying ? (
+                  <Pause className="w-4 h-4" />
+                ) : (
+                  <Play className="w-4 h-4 ml-0.5" />
+                )}
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
+      <p className="text-[9px] font-mono-code font-black text-gray-500 uppercase tracking-wide pt-1">Lagu</p>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-[460px] md:max-h-[520px] overflow-y-auto pr-1">
+      {results.slice(1).map((track) => {
         const playingNow = isTrackPlaying(track.videoId);
         const isCurrent = isTrackCurrent(track.videoId);
         const isDownloading = downloadingId === track.videoId;
@@ -434,6 +483,7 @@ export default function YTMusicSearchView({ playTrack, onDownload, currentId, pl
           </div>
         );
       })}
+      </div>
     </div>
   );
 

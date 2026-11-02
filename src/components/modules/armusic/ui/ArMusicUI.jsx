@@ -505,10 +505,16 @@ export default function ArMusicUI(props) {
     </div>
   );
 
+  const TABS = [
+    { id: 'beranda', label: 'Beranda', icon: Home },
+    { id: 'cari', label: 'Cari', icon: Search },
+    { id: 'pustaka', label: 'Pustaka', icon: Library },
+  ];
+
   /* ------------------------------------------------------------------ render */
 
   return (
-    <div className="space-y-3 font-sans">
+    <div className="font-sans">
       {/* Hidden file input + probe durasi (dipakai file-picker) */}
       <input ref={fileRef} type="file" accept="audio/*" multiple className="hidden" onChange={handlePickFiles} />
       <audio
@@ -518,62 +524,144 @@ export default function ArMusicUI(props) {
         className="hidden"
       />
 
-      {/* Top bar */}
-      <div className="flex items-center justify-between gap-2">
-        <button
-          onClick={() => setActiveTab?.('home')}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212] text-[10px] font-mono-code font-black uppercase"
-        >
-          <Home className="w-3.5 h-3.5" /> Hub
-        </button>
-        <div className="flex items-center gap-1.5">
-          <span className="text-[10px] font-mono-code font-black bg-white px-2 py-1 rounded-md border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212]">
-            {tracks.length} LAGU
-          </span>
-          <button onClick={() => openSheet('eq')} className={`w-8 h-8 rounded-lg border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212] flex items-center justify-center ${eqInfo?.enabled ? 'bg-[#FFE600]' : 'bg-white'}`} aria-label="Equalizer">
-            <SlidersHorizontal className="w-3.5 h-3.5" />
-          </button>
-          <button onClick={() => openSheet('sleep')} className={`w-8 h-8 rounded-lg border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212] flex items-center justify-center ${sleepStatus?.active ? 'bg-[#FFE600]' : 'bg-white'}`} aria-label="Sleep timer">
-            <Timer className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      </div>
+      <div className="flex items-start gap-3 md:gap-4">
+        {/* ================= Sidebar (tablet / desktop) ================= */}
+        <aside className="hidden md:flex flex-col gap-1 w-56 shrink-0 sticky top-2 bg-white border-[2.5px] border-[#121212] rounded-2xl shadow-[3px_3px_0_#121212] p-3 max-h-[calc(100vh-7rem)]">
+          <div className="flex items-center gap-2 pb-2 mb-1 border-b-2 border-[#121212]/10">
+            <span className="w-7 h-7 rounded-lg bg-[#FFE600] border-2 border-[#121212] flex items-center justify-center shrink-0">
+              <Music2 className="w-4 h-4" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[11px] font-black uppercase leading-none truncate">ArMusic</p>
+              <p className="text-[8px] font-mono-code font-bold text-[#121212]/45 truncate">
+                {tracks.length} lagu · {playlists.length} playlist
+              </p>
+            </div>
+          </div>
 
-      {/* Tab utama */}
-      <div className="flex gap-1 p-1 bg-white border-[2.5px] border-[#121212] rounded-xl shadow-[2.5px_2.5px_0_#121212]">
-        {[
-          { id: 'beranda', label: 'Beranda', icon: Home },
-          { id: 'cari', label: 'Cari', icon: Search },
-          { id: 'pustaka', label: 'Pustaka', icon: Library },
-        ].map((t) => {
-          const Icon = t.icon;
-          const active = tab === t.id;
-          return (
+          {TABS.map((t) => {
+            const Icon = t.icon;
+            const active = tab === t.id;
+            return (
+              <button
+                key={t.id}
+                onClick={() => setTab(t.id)}
+                className={`flex items-center gap-2 px-2 py-2 rounded-lg text-[10px] font-mono-code font-black uppercase border-2 transition-all text-left ${
+                  active
+                    ? 'bg-[#FFE600] border-[#121212] shadow-[2px_2px_0_#121212]'
+                    : 'border-transparent hover:bg-[#F8F5EE]'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5 shrink-0" /> {t.label}
+              </button>
+            );
+          })}
+
+          <p className="text-[8px] font-mono-code font-black text-[#121212]/40 px-2 pt-2">PLAYLIST</p>
+          <div className="flex-1 min-h-0 overflow-y-auto space-y-0.5 pr-0.5">
+            {playlists.length === 0 ? (
+              <p className="text-[9px] font-mono-code font-bold text-[#121212]/35 px-2 py-1">Belum ada playlist</p>
+            ) : (
+              playlists.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => { setTab('pustaka'); onPlayPlaylist?.(p.id); }}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[#F8F5EE] text-left"
+                >
+                  <span className="w-5 h-5 rounded bg-[#C6F24E] border-2 border-[#121212] shrink-0" />
+                  <span className="text-[10px] font-bold truncate">{p.name}</span>
+                </button>
+              ))
+            )}
+          </div>
+
+          <div className="flex gap-1 pt-2 mt-1 border-t-2 border-[#121212]/10">
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] font-mono-code font-black uppercase transition-all ${
-                active ? 'bg-[#121212] text-[#FFE600]' : 'text-[#121212]/60 hover:bg-[#F8F5EE]'
-              }`}
+              onClick={() => openSheet('eq')}
+              className={`flex-1 h-8 rounded-lg border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212] flex items-center justify-center ${eqInfo?.enabled ? 'bg-[#FFE600]' : 'bg-white'}`}
+              aria-label="Equalizer"
             >
-              <Icon className="w-3.5 h-3.5" /> {t.label}
+              <SlidersHorizontal className="w-3.5 h-3.5" />
             </button>
-          );
-        })}
-      </div>
+            <button
+              onClick={() => openSheet('sleep')}
+              className={`flex-1 h-8 rounded-lg border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212] flex items-center justify-center ${sleepStatus?.active ? 'bg-[#FFE600]' : 'bg-white'}`}
+              aria-label="Sleep timer"
+            >
+              <Timer className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </aside>
 
-      {error && (
-        <div className="p-2 bg-[#FF525E] border-2 border-[#121212] rounded-xl shadow-[2px_2px_0_#121212]">
-          <p className="text-[10px] font-mono-code font-black text-white">{String(error)}</p>
+        {/* ================= Kolom utama ================= */}
+        <div className="flex-1 min-w-0 space-y-3 pb-2">
+          {/* bar atas */}
+          <div className="flex items-center justify-between gap-2">
+            <button
+              onClick={() => setActiveTab?.('home')}
+              className="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212] text-[10px] font-mono-code font-black uppercase"
+            >
+              <Home className="w-3.5 h-3.5" /> Hub
+            </button>
+            <div className="hidden md:block min-w-0">
+              <h2 className="text-sm font-black uppercase tracking-tight leading-none">
+                {TABS.find((t) => t.id === tab)?.label || 'ArMusic'}
+              </h2>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="md:hidden text-[10px] font-mono-code font-black bg-white px-2 py-1 rounded-md border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212]">
+                {tracks.length} LAGU
+              </span>
+              <button
+                onClick={() => openSheet('eq')}
+                className={`md:hidden w-8 h-8 rounded-lg border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212] flex items-center justify-center ${eqInfo?.enabled ? 'bg-[#FFE600]' : 'bg-white'}`}
+                aria-label="Equalizer"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => openSheet('sleep')}
+                className={`md:hidden w-8 h-8 rounded-lg border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212] flex items-center justify-center ${sleepStatus?.active ? 'bg-[#FFE600]' : 'bg-white'}`}
+                aria-label="Sleep timer"
+              >
+                <Timer className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* tab utama — hanya di layar sempit (di layar lebar sudah jadi sidebar) */}
+          <div className="md:hidden flex gap-1 p-1 bg-white border-[2.5px] border-[#121212] rounded-xl shadow-[2.5px_2.5px_0_#121212]">
+            {TABS.map((t) => {
+              const Icon = t.icon;
+              const active = tab === t.id;
+              return (
+                <button
+                  key={t.id}
+                  onClick={() => setTab(t.id)}
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] font-mono-code font-black uppercase transition-all ${
+                    active ? 'bg-[#121212] text-[#FFE600]' : 'text-[#121212]/60 hover:bg-[#F8F5EE]'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" /> {t.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {error && (
+            <div className="p-2 bg-[#FF525E] border-2 border-[#121212] rounded-xl shadow-[2px_2px_0_#121212]">
+              <p className="text-[10px] font-mono-code font-black text-white">{String(error)}</p>
+            </div>
+          )}
+
+          {tab === 'beranda' && Beranda}
+          {tab === 'cari' && Cari}
+          {tab === 'pustaka' && Pustaka}
+
+          {/* ruang untuk mini player (jangan sampai menutupi item terakhir) */}
+          {current && <div className="h-24 md:h-28" />}
         </div>
-      )}
-
-      {tab === 'beranda' && Beranda}
-      {tab === 'cari' && Cari}
-      {tab === 'pustaka' && Pustaka}
-
-      {/* Ruang untuk mini player */}
-      {current && <div className="h-16" />}
+      </div>
 
       <MiniPlayer
         track={current}

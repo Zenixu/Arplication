@@ -7,6 +7,27 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.6] - 2026-11-02
+
+# v1.9.6 — Layout baru: fokus ke musik
+
+## Baru
+- **Layout responsif bergaya Spotify.** Di layar lebar (tablet/desktop) muncul
+  sidebar berisi navigasi + daftar playlist; di HP tetap tab Beranda/Cari/Pustaka.
+  Area konten tidak lagi selebar layar penuh tanpa arah.
+- **Kartu "Hasil Teratas"** di tab Cari: hasil pertama ditampilkan besar dengan
+  tombol putar bulat, sisanya jadi daftar dua kolom di layar lebar.
+- Desain dibuat dulu di FigCraft — sumbernya ada di `docs/design/`
+  (`armusic-redesign.figcraft`, plus render `armusic-mobile.png` dan
+  `armusic-tablet.png`).
+
+## Perbaikan
+- **Tumpang tindih mini player diperbaiki.** Ruang bawah untuk mini player
+  dinaikkan dari 64px ke 96px (mobile) / 112px (layar lebar), jadi item terakhir
+  tidak lagi tertutup pemutar.
+- Subjudul "N lagu · N playlist" tidak lagi tampil dua kali di layar lebar.
+- Kontrol equalizer & sleep timer pindah ke sidebar di layar lebar.
+
 ## [1.9.5] - 2026-11-02
 
 # v1.9.5 — Antrean pencarian tidak lagi melompat
