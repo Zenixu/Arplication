@@ -7,6 +7,31 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.2] - 2026-11-02
+
+# v1.9.2 — ArMusic: tampilan baru
+
+## Baru
+- **Kerangka ArMusic baru**: Beranda · Cari · Pustaka, menggantikan satu daftar panjang
+  dengan kotak cari di atasnya.
+- **Mini player** menetap di atas navigasi bawah (progres, judul, play/jeda, lanjut);
+  ketuk untuk membuka pemutar.
+- **Pemutar layar penuh** dengan tiga tab: Pemutar · Lirik · Antrean.
+- **Lirik interaktif**: bergulir otomatis, baris aktif ditandai, dan baris bisa diketuk
+  untuk melompat ke detik tersebut.
+- **Antrean** bernomor dengan lagu aktif ditandai; ketuk untuk pindah lagu.
+- **Pustaka** dengan empat sub-tab (Lagu · Artis · Folder · Playlist); ketuk artis/folder
+  untuk memutar grup itu sebagai antrean.
+- **Sheet bawah**: Equalizer (preset + 5 band), Sleep timer (5–60 menit), buat/ubah nama
+  playlist, tambah lagu ke playlist.
+- Tombol **back** menutup sheet lebih dulu, baru pemutar.
+
+## Catatan
+- Mesin audio tidak diubah (ExoPlayer native, foreground service, MediaSession, EQ,
+  sleep timer tetap sama). Perubahan murni pada lapisan tampilan.
+- Rantai sumber audio YouTube masih perlu perbaikan: beberapa lapis cadangan sudah mati,
+  sehingga pemutaran bisa lambat/gagal sebelum mencapai lapis yt-dlp.
+
 ## [1.9.1] - 2026-10-06
 
 # v1.9.1

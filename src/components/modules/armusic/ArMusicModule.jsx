@@ -12,6 +12,7 @@ import { loadPlaylists, savePlaylists, createPlaylist, renamePlaylist, deletePla
 import { fetchLyrics, activeLyricIndex, } from '../../../services/lyrics.js';
 import { registerBackHandler } from '../../../services/backHandler.js';
 import YTMusicWrapper from './YTMusicWrapper.jsx';
+import ArMusicUI from './ui/ArMusicUI.jsx';
 
 function filterTracks(tracks, query) {
   const q = String(query || '').toLowerCase().trim();
@@ -928,626 +929,63 @@ export default function ArMusicModule({ setActiveTab }) {
     );
   };
 
+  // Antrean yang dipakai Now Playing (mengikuti urutan shuffle bila aktif).
+  const queueList = (shuffle && order.length === tracks.length)
+    ? order.map((i) => tracks[i]).filter(Boolean)
+    : (filtered.length > 0 ? filtered : tracks);
+  const queueIndex = Math.max(0, queueList.findIndex((t) => t.id === currentId));
+
   return (
-    <div className="space-y-3.5 sm:space-y-5 font-sans">
-      {/* Header */}
-      <div className="p-4 sm:p-5 bg-[#D8B4FE] rounded-2xl border-[2.5px] border-[#121212] shadow-[4px_4px_0px_#121212] space-y-3">
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          <button
-            onClick={() => setActiveTab('home')}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white border-2 border-[#121212] shadow-[1.5px_1.5px_0px_#121212] text-[11px] font-mono-code font-black uppercase hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all"
-          >
-            <Home className="w-3.5 h-3.5" />
-            <span>Hub</span>
-          </button>
-          <div className="flex items-center gap-1.5 font-mono-code text-[10px] font-black bg-white px-2 py-0.5 rounded-md border border-[#121212] shadow-[1px_1px_0px_#121212]">
-            <ListMusic className="w-3 h-3" />
-            <span>{tracks.length} LAGU</span>
-          </div>
-        </div>
-        <div>
-          <h1 className="text-xl sm:text-2xl font-black tracking-tight text-[#121212] uppercase leading-tight">
-            ArMusic
-          </h1>
-          <p className="text-xs font-bold text-gray-800 leading-relaxed mt-1">
-            Pemutar lagu lokal dari storage HP — hasil unduhan Aruthtale & file musikmu, 100% offline.
-          </p>
-        </div>
-        {/* Search */}
-        <div className="flex items-center gap-2 bg-white rounded-xl border-2 border-[#121212] shadow-[2px_2px_0px_#121212] px-3 py-2">
-          <Search className="w-4 h-4 text-[#121212] shrink-0" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Cari judul, artis, nama file..."
-            className="flex-1 min-w-0 bg-transparent outline-none text-sm font-bold text-[#121212] placeholder:text-gray-400"
-          />
-        </div>
-        {/* Actions */}
-        <div className="flex flex-wrap gap-2">
-          <button
-            onClick={handleScan}
-            disabled={scanning || !isNative()}
-            title={isNative() ? 'Scan folder Aruthtale & Music' : 'Scan hanya tersedia di aplikasi Android'}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#38E54D] border-2 border-[#121212] shadow-[2px_2px_0px_#121212] text-xs font-black uppercase hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all disabled:opacity-50"
-          >
-            {scanning ? <Loader2 className="w-4 h-4 animate-spin" /> : <ScanLine className="w-4 h-4" />}
-            <span>{scanning ? 'Memindai...' : 'Scan Storage'}</span>
-          </button>
-          <button
-            onClick={() => fileRef.current?.click()}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border-2 border-[#121212] shadow-[2px_2px_0px_#121212] text-xs font-black uppercase hover:translate-x-0.5 hover:translate-y-0.5 hover:shadow-none transition-all"
-          >
-            <FileUp className="w-4 h-4" />
-            <span>Pilih File</span>
-          </button>
-          <input
-            ref={fileRef}
-            type="file"
-            accept="audio/*,.mp3,.m4a,.ogg,.wav,.flac,.opus"
-            multiple
-            className="hidden"
-            onChange={handlePickFiles}
-          />
-          {!isNative() && (
-            <span className="text-[10px] font-mono-code font-bold text-[#121212]/60 self-center">
-              *Scan storage aktif di aplikasi Android
-            </span>
-          )}
-        </div>
-        {(scanning || scanMsg) && (
-          <p className="text-[11px] font-mono-code font-bold text-[#121212]/70 truncate">{scanMsg}</p>
-        )}
-        {error && (
-          <div className="flex items-start gap-2 p-2.5 rounded-xl bg-white border-2 border-[#121212] shadow-[2px_2px_0px_#121212]">
-            <AlertCircle className="w-4 h-4 text-[#FF525E] shrink-0 mt-0.5" />
-            <p className="text-xs font-bold text-[#121212]">{error}</p>
-          </div>
-        )}
-      </div>
-
-      {/* Now Playing */}
-      {current && (
-        <div className="p-4 bg-[#121212] rounded-2xl border-[2.5px] border-[#121212] shadow-[4px_4px_0px_#121212] space-y-3 text-white">
-          <div className="flex items-center gap-3 min-w-0">
-            <div className="w-12 h-12 rounded-xl bg-[#FFE600] border-2 border-white/20 flex items-center justify-center shrink-0">
-              <Music className="w-6 h-6 text-[#121212]" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="font-black text-sm truncate">{current.title}</p>
-              <p className="text-[11px] font-mono-code font-bold text-white/60 truncate">{current.artist}</p>
-            </div>
-            <span className="text-[10px] font-mono-code font-bold text-white/60 shrink-0 flex items-center gap-1">
-              <Clock3 className="w-3 h-3" />
-              {formatTrackDuration(elapsed) || '0:00'} / {formatTrackDuration(duration) || formatTrackDuration(current.durationSec) || '--:--'}
-            </span>
-            <button
-              onClick={() => setShowLyrics((v) => !v)}
-              title={showLyrics ? 'Sembunyikan lirik' : 'Tampilkan lirik'}
-              className={`w-8 h-8 rounded-lg border-2 flex items-center justify-center transition-all shrink-0 ${showLyrics ? 'bg-[#FFE600] text-[#121212] border-[#FFE600]' : 'bg-transparent text-white/60 border-white/30 hover:text-white'}`}
-            >
-              {showLyrics ? <ChevronDown className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-            </button>
-          </div>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            step="0.1"
-            value={progress}
-            onChange={handleSeek}
-            className="w-full accent-[#FFE600]"
-          />
-          <div className="flex items-center justify-center gap-3">
-            <button
-              onClick={toggleShuffle}
-              title="Acak"
-              className={`w-9 h-9 rounded-lg border-2 flex items-center justify-center transition-all ${shuffle ? 'bg-[#FFE600] text-[#121212] border-[#FFE600]' : 'bg-transparent text-white/60 border-white/30'}`}
-            >
-              <Shuffle className="w-4 h-4" />
-            </button>
-            <button
-              onClick={prevTrack}
-              className="w-11 h-11 rounded-xl bg-white text-[#121212] border-2 border-white flex items-center justify-center hover:bg-[#FFE600] transition-colors"
-            >
-              <SkipBack className="w-5 h-5" />
-            </button>
-            <button
-              onClick={togglePlay}
-              className="w-14 h-14 rounded-2xl bg-[#FFE600] text-[#121212] border-2 border-[#FFE600] flex items-center justify-center hover:scale-105 transition-transform"
-            >
-              {playing ? <Pause className="w-7 h-7" /> : <Play className="w-7 h-7 ml-0.5" />}
-            </button>
-            <button
-              onClick={() => nextTrack()}
-              className="w-11 h-11 rounded-xl bg-white text-[#121212] border-2 border-white flex items-center justify-center hover:bg-[#FFE600] transition-colors"
-            >
-              <SkipForward className="w-5 h-5" />
-            </button>
-            <button
-              onClick={toggleRepeatOne}
-              title="Ulangi satu lagu"
-              className={`w-9 h-9 rounded-lg border-2 flex items-center justify-center transition-all ${repeatOne ? 'bg-[#FFE600] text-[#121212] border-[#FFE600]' : 'bg-transparent text-white/60 border-white/30'}`}
-            >
-              <Repeat className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => { refreshEqInfo(); setShowEq(true); }}
-              title="Equalizer"
-              className={`w-9 h-9 rounded-lg border-2 flex items-center justify-center transition-all ${eqInfo?.enabled ? 'bg-[#FFE600] text-[#121212] border-[#FFE600]' : 'bg-transparent text-white/60 border-white/30'}`}
-            >
-              <SlidersHorizontal className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => { refreshSleepStatus(); setShowSleep(true); }}
-              title="Sleep timer"
-              className={`relative w-9 h-9 rounded-lg border-2 flex items-center justify-center transition-all ${sleepStatus.active ? 'bg-[#FFE600] text-[#121212] border-[#FFE600]' : 'bg-transparent text-white/60 border-white/30'}`}
-            >
-              {sleepStatus.active ? <TimerOff className="w-4 h-4" /> : <Timer className="w-4 h-4" />}
-            </button>
-          </div>
-          {sleepStatus.active && sleepStatus.remainingMs > 0 && (
-            <p className="text-center text-[10px] font-mono-code font-bold text-[#FFE600]">
-              Tidur dalam {formatSleepRemaining(sleepStatus.remainingMs)} — ketuk ikon timer untuk batalkan
-            </p>
-          )}
-          {showLyrics && (
-            <LyricsPanel
-              lyricsState={lyricsState}
-              elapsed={elapsed}
-              lyricBoxRef={lyricBoxRef}
-            />
-          )}
-        </div>
-      )}
-
-      {/* Koleksi — sub-navbar: SEMUA | ARTIS | FOLDER | PLAYLIST */}
-      <div className="nb-card p-4 bg-white space-y-3 shadow-[3px_3px_0px_#121212]">
-        <div className="flex items-center justify-between border-b-2 border-black pb-2 flex-wrap gap-2">
-          <div className="flex items-center gap-2">
-            <FolderOpen className="w-4 h-4 text-[#121212]" />
-            <h3 className="font-mono-code font-black text-xs text-[#121212] uppercase tracking-wider">
-              KOLEKSI ({tracks.length})
-            </h3>
-          </div>
-          <div className="flex items-center gap-1.5 flex-wrap">
-            {[['semua', 'Semua'], ['artis', 'Artis'], ['folder', 'Folder'], ['playlist', `Playlist (${playlists.length})`], ['ytmusic', '🎵 YouTube Music']].map(([v, label]) => (
-              <button
-                key={v}
-                onClick={() => setMusicView(v)}
-                className={`px-2 py-1 rounded-lg border border-black text-[10px] font-black uppercase shadow-[1.5px_1.5px_0px_#121212] ${musicView === v ? 'bg-[#121212] text-[#FFE600]' : 'bg-white text-[#121212]'}`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {musicView === 'semua' && (
-          <>
-            {filtered.length > 0 && (
-              <button
-                onClick={() => playTrack(filtered[0])}
-                className="flex items-center gap-1 px-2 py-1 rounded-lg bg-[#38E54D] border border-black text-[10px] font-black uppercase shadow-[1.5px_1.5px_0px_#121212]"
-              >
-                <Play className="w-3 h-3" />
-                <span>Putar{query ? ' hasil' : ''} ({filtered.length})</span>
-              </button>
-            )}
-            {filtered.length === 0 ? (
-              <div className="text-center py-8 space-y-2">
-                <Music className="w-10 h-10 mx-auto text-[#121212]/20" />
-                <p className="text-sm font-black text-[#121212]">
-                  {tracks.length === 0 ? 'Belum ada lagu' : 'Tidak ada hasil'}
-                </p>
-                <p className="text-xs font-medium text-gray-500 max-w-xs mx-auto">
-                  {tracks.length === 0
-                    ? 'Ketuk "Scan Storage" untuk memindai hasil unduhan Aruthtale, atau "Pilih File" untuk menambah manual.'
-                    : 'Coba kata kunci lain.'}
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-[420px] overflow-y-auto pr-1">
-                {filtered.map((track) => renderTrackCard(track))}
-              </div>
-            )}
-          </>
-        )}
-
-        {(musicView === 'artis' || musicView === 'folder') && (
-          <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
-            {groupTracksBy(filtered, musicView === 'artis' ? 'artist' : 'folder').map(({ name, items }) => {
-              const key = `${musicView}:${name}`;
-              const open = groupOpen[key] ?? false;
-              return (
-                <div key={key} className="rounded-xl border-2 border-black overflow-hidden">
-                  <button
-                    onClick={() => setGroupOpen((p) => ({ ...p, [key]: !open }))}
-                    className="w-full flex items-center gap-2 px-3 py-2 bg-[#F8F5EE] hover:bg-[#FFE600]/40 transition-colors"
-                  >
-                    {open ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                    <span className="flex-1 text-left text-xs font-black text-[#121212] truncate">{name}</span>
-                    <span className="text-[10px] font-mono-code font-bold text-gray-500">{items.length} lagu</span>
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => { e.stopPropagation(); if (items[0]) playTrack(items[0], false, items); }}
-                      onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); if (items[0]) playTrack(items[0], false, items); } }}
-                      className="w-7 h-7 rounded-lg bg-[#38E54D] border border-black flex items-center justify-center shadow-[1px_1px_0px_#121212]"
-                      title={`Putar semua dari ${name}`}
-                    >
-                      <Play className="w-3.5 h-3.5" />
-                    </span>
-                  </button>
-                  {open && (
-                    <div className="p-2 space-y-2 bg-white border-t-2 border-black">
-                      {items.map((track) => renderTrackCard(track))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-            {filtered.length === 0 && (
-              <p className="text-center text-xs font-bold text-gray-500 py-6">Belum ada lagu untuk dikelompokkan.</p>
-            )}
-          </div>
-        )}
-
-        {musicView === 'playlist' && (
-          <div className="space-y-3">
-            {/* Buat playlist baru */}
-            <div className="flex gap-2">
-              <input
-                value={newPlaylistName}
-                onChange={(e) => setNewPlaylistName(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleCreatePlaylist(); }}
-                placeholder="Nama playlist baru..."
-                maxLength={60}
-                className="flex-1 min-w-0 px-3 py-2 rounded-xl bg-white border-2 border-[#121212] shadow-[2px_2px_0px_#121212] text-xs font-bold text-[#121212] placeholder:text-gray-400 outline-none"
-              />
-              <button
-                onClick={handleCreatePlaylist}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[#38E54D] border-2 border-[#121212] shadow-[2px_2px_0px_#121212] text-xs font-black uppercase"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Buat</span>
-              </button>
-            </div>
-            {playlists.length === 0 ? (
-              <div className="text-center py-6 space-y-2">
-                <ListMusic className="w-10 h-10 mx-auto text-[#121212]/20" />
-                <p className="text-sm font-black text-[#121212]">Belum ada playlist</p>
-                <p className="text-xs font-medium text-gray-500 max-w-xs mx-auto">
-                  Buat playlist di atas, lalu ketuk ikon tambah di tiap lagu untuk mengisinya.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-2 max-h-[420px] overflow-y-auto pr-1">
-                {playlists.map((pl) => {
-                  const list = resolvePlaylistTracks(playlists, pl.id, tracks);
-                  const open = openPlaylistId === pl.id;
-                  const editing = editingPlaylistId === pl.id;
-                  return (
-                    <div key={pl.id} className="rounded-xl border-2 border-black overflow-hidden">
-                      <button
-                        onClick={() => setOpenPlaylistId(open ? null : pl.id)}
-                        className={`w-full flex items-center gap-2 px-3 py-2 transition-colors ${open ? 'bg-[#FFE600]' : 'bg-[#F8F5EE] hover:bg-[#FFE600]/40'}`}
-                      >
-                        {open ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                        {editing ? (
-                          <span className="flex-1 flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                            <input
-                              value={editingName}
-                              onChange={(e) => setEditingName(e.target.value)}
-                              onKeyDown={(e) => { if (e.key === 'Enter') handleRenamePlaylist(pl.id); if (e.key === 'Escape') setEditingPlaylistId(null); }}
-                              autoFocus
-                              maxLength={60}
-                              className="flex-1 min-w-0 px-2 py-1 rounded-lg border border-black text-xs font-bold outline-none"
-                            />
-                            <span role="button" tabIndex={0} onClick={() => handleRenamePlaylist(pl.id)} onKeyDown={(e) => { if (e.key === 'Enter') handleRenamePlaylist(pl.id); }} className="w-7 h-7 rounded-lg bg-[#38E54D] border border-black flex items-center justify-center" title="Simpan">
-                              <Check className="w-3.5 h-3.5" />
-                            </span>
-                          </span>
-                        ) : (
-                          <>
-                            <span className="flex-1 text-left text-xs font-black text-[#121212] truncate">{pl.name}</span>
-                            <span className="text-[10px] font-mono-code font-bold text-gray-500">{list.length} lagu</span>
-                          </>
-                        )}
-                        <span
-                          role="button"
-                          tabIndex={0}
-                          onClick={(e) => { e.stopPropagation(); handlePlayPlaylist(pl.id); }}
-                          onKeyDown={(e) => { if (e.key === 'Enter') { e.stopPropagation(); handlePlayPlaylist(pl.id); } }}
-                          className="w-7 h-7 rounded-lg bg-[#38E54D] border border-black flex items-center justify-center shadow-[1px_1px_0px_#121212]"
-                          title={`Putar ${pl.name}`}
-                        >
-                          <Play className="w-3.5 h-3.5" />
-                        </span>
-                      </button>
-                      {open && (
-                        <div className="p-2 space-y-2 bg-white border-t-2 border-black">
-                          <div className="flex gap-1.5">
-                            <button
-                              onClick={() => { setEditingPlaylistId(pl.id); setEditingName(pl.name); }}
-                              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-black text-[10px] font-black uppercase"
-                            >
-                              <Pencil className="w-3 h-3" />
-                              <span>Ubah nama</span>
-                            </button>
-                            <button
-                              onClick={() => handleDeletePlaylist(pl.id)}
-                              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-white border border-black text-[10px] font-black uppercase text-red-600"
-                            >
-                              <Trash2 className="w-3 h-3" />
-                              <span>Hapus</span>
-                            </button>
-                          </div>
-                          {list.length === 0 ? (
-                            <p className="text-[11px] font-bold text-gray-500 py-2 text-center">
-                              Playlist kosong — ketuk ikon tambah di daftar Semua untuk mengisi.
-                            </p>
-                          ) : (
-                            list.map((track) => (
-                              <div
-                                key={track.id}
-                                onClick={() => playTrack(track, false, list)}
-                                className={`nb-card p-2 flex items-center gap-2 transition-all cursor-pointer shadow-[1.5px_1.5px_0px_#121212] ${track.id === currentId ? 'bg-[#FFE600]' : 'bg-[#F8F5EE] hover:bg-white'}`}
-                              >
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs font-black text-[#121212] truncate">{track.title}</p>
-                                  <p className="text-[10px] font-mono-code font-bold text-gray-500 truncate">{track.artist}</p>
-                                </div>
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); handleRemoveTrackFromPlaylist(pl.id, track.id); }}
-                                  className="w-7 h-7 rounded-lg bg-white hover:bg-red-100 border border-black flex items-center justify-center text-red-600 shrink-0"
-                                  title="Keluarkan dari playlist"
-                                >
-                                  <X className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
-        {musicView === 'ytmusic' && (
-          <YTMusicWrapper
-            playTrack={playTrack}
-            onDownload={(metadata) => {
-              if (metadata?.downloadPath || metadata?.title) {
-                console.log('YouTube Music track downloaded:', metadata);
-                const filename = metadata.filename || `${metadata.title} - ${metadata.artist || 'YouTube Music'}.mp3`;
-                const newTrack = {
-                  id: `scan:${metadata.downloadPath || filename}`,
-                  title: metadata.title,
-                  artist: metadata.artist || 'YouTube Music',
-                  filename,
-                  folder: 'Download/Aruthtale/YouTube',
-                  uri: metadata.downloadPath,
-                  cover: metadata.cover,
-                  duration: metadata.duration,
-                  source: 'scan',
-                };
-                const updated = addOrUpdateTrackInLibrary(newTrack);
-                setTracks(updated);
-
-                // Run background scan on native to ensure exact filesystem URI match
-                if (isNative()) {
-                  scanLocalAudio().then((scanned) => {
-                    const merged = mergeScanResults(loadLibrary(), scanned);
-                    saveLibrary(merged);
-                    setTracks(merged);
-                  }).catch(() => {});
-                }
-              }
-            }}
-            currentId={currentId}
-            playing={playing}
-            onPlayError={(err) => {
-              console.error('YouTube Music play error:', err);
-            }}
-          />
-        )}
-      </div>
-
-      {/* Modal Equalizer */}
-      {showEq && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-3" onClick={() => setShowEq(false)}>
-          <div
-            className="w-full max-w-md bg-white rounded-2xl border-[2.5px] border-[#121212] shadow-[4px_4px_0px_#121212] p-4 space-y-3 max-h-[85vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b-2 border-black pb-2">
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal className="w-4 h-4" />
-                <h3 className="font-black text-sm uppercase">Equalizer</h3>
-              </div>
-              <button onClick={() => setShowEq(false)} className="w-8 h-8 rounded-lg bg-white border-2 border-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#121212]" title="Tutup">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            {eqLoading && !eqInfo ? (
-              <p className="flex items-center gap-2 text-xs font-bold text-gray-500"><Loader2 className="w-4 h-4 animate-spin" /> Memuat equalizer...</p>
-            ) : !eqInfo || eqInfo.supported === false ? (
-              <p className="text-xs font-bold text-gray-500">Perangkat ini tidak mendukung equalizer.</p>
-            ) : (
-              <>
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-black uppercase">{eqInfo.enabled ? 'Aktif' : 'Mati'}</span>
-                  <button
-                    onClick={handleEqToggle}
-                    className={`px-3 py-1.5 rounded-xl border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_#121212] ${eqInfo.enabled ? 'bg-[#FFE600]' : 'bg-white'}`}
-                  >
-                    {eqInfo.enabled ? 'Matikan' : 'Nyalakan'}
-                  </button>
-                </div>
-                {eqInfo.presetNames?.length > 0 && (
-                  <div>
-                    <p className="text-[10px] font-mono-code font-black uppercase text-gray-500 mb-1.5">Preset</p>
-                    <div className="flex gap-1.5 overflow-x-auto pb-1">
-                      {eqInfo.presetNames.map((name, i) => (
-                        <button
-                          key={name}
-                          onClick={() => handleEqPreset(i)}
-                          className={`px-2.5 py-1.5 rounded-lg border border-black text-[11px] font-black whitespace-nowrap shadow-[1.5px_1.5px_0px_#121212] ${eqInfo.presetIndex === i ? 'bg-[#121212] text-[#FFE600]' : 'bg-[#F8F5EE]'}`}
-                        >
-                          {name}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                <div className="space-y-2.5">
-                  {Array.from({ length: eqInfo.bandCount }).map((_, b) => (
-                    <div key={b} className="space-y-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[11px] font-black">{formatEqFreq(eqInfo.centerFreqs?.[b])}</span>
-                        <span className="text-[11px] font-mono-code font-bold text-gray-600">{formatEqGain(eqInfo.gains?.[b] ?? 0)}</span>
-                      </div>
-                      <input
-                        type="range"
-                        min={eqInfo.minGainMb}
-                        max={eqInfo.maxGainMb}
-                        step={100}
-                        value={eqInfo.gains?.[b] ?? 0}
-                        onChange={(e) => handleEqBand(b, Number(e.target.value))}
-                        disabled={!eqInfo.enabled}
-                        className="w-full accent-[#121212] disabled:opacity-40"
-                      />
-                    </div>
-                  ))}
-                </div>
-                <button
-                  onClick={handleEqReset}
-                  className="w-full px-3 py-2 rounded-xl bg-white border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_#121212]"
-                >
-                  Reset ke Flat
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Modal Sleep Timer */}
-      {showSleep && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-3" onClick={() => setShowSleep(false)}>
-          <div
-            className="w-full max-w-sm bg-white rounded-2xl border-[2.5px] border-[#121212] shadow-[4px_4px_0px_#121212] p-4 space-y-3"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b-2 border-black pb-2">
-              <div className="flex items-center gap-2">
-                <Timer className="w-4 h-4" />
-                <h3 className="font-black text-sm uppercase">Sleep Timer</h3>
-              </div>
-              <button onClick={() => setShowSleep(false)} className="w-8 h-8 rounded-lg bg-white border-2 border-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#121212]" title="Tutup">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            {!isNative() ? (
-              <p className="text-xs font-bold text-gray-500">Sleep timer hanya tersedia di aplikasi Android.</p>
-            ) : (
-              <>
-                <p className="text-xs font-bold text-gray-700">
-                  {sleepStatus.active && sleepStatus.remainingMs > 0
-                    ? `Musik berhenti dalam ${formatSleepRemaining(sleepStatus.remainingMs)} (fade-out 3 detik).`
-                    : 'Musik berhenti otomatis + fade-out 3 detik saat waktu habis.'}
-                </p>
-                <div className="grid grid-cols-3 gap-2">
-                  {SLEEP_OPTIONS.map((m) => {
-                    const active = m === 0
-                      ? !sleepStatus.active
-                      : sleepStatus.active && sleepStatus.totalMin === m;
-                    return (
-                      <button
-                        key={m}
-                        onClick={() => handleSetSleep(m)}
-                        className={`px-2 py-2.5 rounded-xl border-2 border-black text-xs font-black shadow-[2px_2px_0px_#121212] ${active ? 'bg-[#121212] text-[#FFE600]' : 'bg-[#F8F5EE]'}`}
-                      >
-                        {m === 0 ? 'Mati' : `${m} mnt`}
-                      </button>
-                    );
-                  })}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Modal Tambah ke Playlist */}
-      {addToPickTrack && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-end sm:items-center justify-center p-3" onClick={() => setAddToPickTrack(null)}>
-          <div
-            className="w-full max-w-sm bg-white rounded-2xl border-[2.5px] border-[#121212] shadow-[4px_4px_0px_#121212] p-4 space-y-3 max-h-[85vh] overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between border-b-2 border-black pb-2">
-              <div className="flex items-center gap-2 min-w-0">
-                <ListPlus className="w-4 h-4 shrink-0" />
-                <h3 className="font-black text-sm uppercase truncate">Tambah ke Playlist</h3>
-              </div>
-              <button onClick={() => setAddToPickTrack(null)} className="w-8 h-8 rounded-lg bg-white border-2 border-black flex items-center justify-center shadow-[1.5px_1.5px_0px_#121212] shrink-0" title="Tutup">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <p className="text-xs font-bold text-gray-600 truncate">{addToPickTrack.title} — {addToPickTrack.artist}</p>
-            <div className="flex gap-2">
-              <input
-                value={newPlaylistName}
-                onChange={(e) => setNewPlaylistName(e.target.value)}
-                onKeyDown={(e) => { if (e.key === 'Enter') handleCreatePlaylist(); }}
-                placeholder="Playlist baru..."
-                maxLength={60}
-                className="flex-1 min-w-0 px-3 py-2 rounded-xl bg-[#F8F5EE] border-2 border-black text-xs font-bold outline-none placeholder:text-gray-400"
-              />
-              <button
-                onClick={handleCreatePlaylist}
-                className="flex items-center gap-1 px-3 py-2 rounded-xl bg-[#38E54D] border-2 border-black text-xs font-black uppercase shadow-[2px_2px_0px_#121212]"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-            {playlists.length === 0 ? (
-              <p className="text-xs font-bold text-gray-500 text-center py-2">Belum ada playlist — buat dulu di atas.</p>
-            ) : (
-              <div className="space-y-1.5">
-                {playlists.map((pl) => {
-                  const inList = isTrackInPlaylist(playlists, pl.id, addToPickTrack.id);
-                  return (
-                    <button
-                      key={pl.id}
-                      onClick={() => handleAddTrackToPlaylist(pl.id, addToPickTrack.id)}
-                      className={`w-full flex items-center gap-2 px-3 py-2 rounded-xl border-2 border-black text-left shadow-[1.5px_1.5px_0px_#121212] ${inList ? 'bg-[#FFE600]' : 'bg-[#F8F5EE] hover:bg-white'}`}
-                    >
-                      <span className="flex-1 min-w-0 text-xs font-black truncate">{pl.name}</span>
-                      {inList && <Check className="w-4 h-4 shrink-0" />}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Hidden probe untuk durasi file-picker */}
-      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-      <audio
-        src={current ? toPlayableSrc(current.uri) || undefined : undefined}
-        preload="metadata"
-        onLoadedMetadata={onLoadedMeta}
-        className="hidden"
-      />
-    </div>
+    <ArMusicUI
+      tracks={tracks}
+      playlists={playlists}
+      current={current}
+      currentId={currentId}
+      playing={playing}
+      elapsed={elapsed}
+      duration={duration}
+      shuffle={shuffle}
+      repeatOne={repeatOne}
+      scanMsg={scanMsg}
+      scanning={scanning}
+      error={error}
+      lyricsState={lyricsState}
+      eqInfo={eqInfo}
+      eqLoading={eqLoading}
+      sleepStatus={sleepStatus}
+      query={query}
+      setQuery={setQuery}
+      playTrack={playTrack}
+      togglePlay={togglePlay}
+      nextTrack={nextTrack}
+      prevTrack={prevTrack}
+      seekTo={seekTo}
+      toggleShuffle={toggleShuffle}
+      toggleRepeatOne={toggleRepeatOne}
+      handleScan={handleScan}
+      handlePickFiles={handlePickFiles}
+      handleRemove={handleRemove}
+      handleCreatePlaylist={handleCreatePlaylist}
+      handleRenamePlaylist={handleRenamePlaylist}
+      handleDeletePlaylist={handleDeletePlaylist}
+      handleAddTrackToPlaylist={handleAddTrackToPlaylist}
+      handleRemoveTrackFromPlaylist={handleRemoveTrackFromPlaylist}
+      handlePlayPlaylist={handlePlayPlaylist}
+      handleEqToggle={handleEqToggle}
+      handleEqBand={handleEqBand}
+      handleEqPreset={handleEqPreset}
+      handleEqReset={handleEqReset}
+      handleSetSleep={handleSetSleep}
+      refreshEqInfo={refreshEqInfo}
+      setActiveTab={setActiveTab}
+      onLoadedMeta={onLoadedMeta}
+      toPlayableSrc={toPlayableSrc}
+      formatTrackDuration={formatTrackDuration}
+      queue={queueList}
+      queueIndex={queueIndex}
+      onJumpQueue={(i) => { const t = queueList[i]; if (t) playTrack(t, false, queueList); }}
+      pl={{ newPlaylistName, setNewPlaylistName, editingName, setEditingName, editingPlaylistId, setEditingPlaylistId }}
+      onYtDownload={(metadata) => console.log('YT Music track:', metadata?.title)}
+    />
   );
 }
