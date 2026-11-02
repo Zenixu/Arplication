@@ -34,6 +34,8 @@ export default function ArloaderModule({ setActiveTab }) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [currentSettings, setCurrentSettings] = useState(getDownloadSettings());
   const [clipSuggestion, setClipSuggestion] = useState('');
+  const [elapsed, setElapsed] = useState(0);
+  const resultRef = useRef(null);
 
   // Queue state for multi-link batch extraction
   const [queue, setQueue] = useState([]);
@@ -61,6 +63,32 @@ export default function ArloaderModule({ setActiveTab }) {
     setIsSettingsOpen(false);
     setCurrentSettings(getDownloadSettings());
   };
+
+  // Penghitung detik selama analisis — supaya pengguna tahu aplikasi masih
+  // bekerja, bukan macet.
+  useEffect(() => {
+    if (!loading) {
+      setElapsed(0);
+      return undefined;
+    }
+    const started = Date.now();
+    const id = setInterval(() => {
+      setElapsed(Math.floor((Date.now() - started) / 1000));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [loading]);
+
+  // Gulir ke kartu hasil begitu info media didapat, supaya pengguna langsung
+  // melihat pilihan format.
+  useEffect(() => {
+    if (mediaResult && resultRef.current) {
+      const t = setTimeout(() => {
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+      return () => clearTimeout(t);
+    }
+    return undefined;
+  }, [mediaResult]);
 
   const processQueueItem = async (link) => {
     const res = await scrapeMedia(link);
@@ -206,6 +234,7 @@ export default function ArloaderModule({ setActiveTab }) {
           setUrl={setUrl}
           onFetch={handleFetch}
           loading={loading}
+          elapsed={elapsed}
         />
 
         <button
@@ -307,6 +336,15 @@ export default function ArloaderModule({ setActiveTab }) {
       )}
 
       {/* Media Result Display (Single / Album / Playlist) */}
+      {mediaResult && (
+        <div ref={resultRef} className="flex items-center gap-2 px-1 pt-1 scroll-mt-20">
+          <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+          <p className="text-[11px] font-mono-code font-bold text-[#121212]/70 leading-snug">
+            Info didapat. Pilih format di bawah untuk mulai mengunduh.
+          </p>
+        </div>
+      )}
+
       {mediaResult && (
         <div>
           <MediaCard

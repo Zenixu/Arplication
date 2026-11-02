@@ -59,7 +59,11 @@ Satu item = satu perubahan yang bisa dirilis sendiri.
 
 ## B. Fungsi
 
-- [ ] **B1 · `P0` · `M` · Arloader tidak menunjukkan progres unduhan.**
+- [x] **B1 · `P0` · `M` · Arloader tidak menunjukkan progres unduhan.** — **selesai di v1.9.14**
+      Catatan: progres per-format (bar + persen + pesan) ternyata **sudah ada**
+      di `MediaCard`. Yang kurang justru langkah sebelumnya — tombol utama
+      berlabel "ANALYZE & DOWNLOAD" padahal hanya mengambil info, tanpa penanda
+      waktu, dan tanpa petunjuk setelah hasil muncul.
       Setelah menekan unduh, layar diam sampai file muncul di riwayat.
       Minimal: indikator "sedang mengunduh…" + tombol **buka file** setelah selesai.
       *Alasan:* untuk file besar, pengguna mengira unduhan gagal.

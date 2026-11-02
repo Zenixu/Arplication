@@ -7,6 +7,27 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.14] - 2026-11-02
+
+# v1.9.14 — Alur unduh Arloader lebih jelas
+
+## Perbaikan
+- **Label tombol utama tidak lagi menipu.** Tulisannya `ANALYZE & DOWNLOAD`,
+  padahal tombol itu hanya **mengambil info media** — unduhan sebenarnya baru
+  terjadi setelah memilih format. Sekarang: **"AMBIL INFO MEDIA"**
+  (atau "PROSES N TAUTAN" untuk multi-link).
+- **Penghitung detik saat mengambil info.** Tombol menampilkan
+  "MENGAMBIL INFO · 3s" sehingga jelas aplikasi masih bekerja, bukan macet.
+  Lewat 5 detik muncul keterangan bahwa jaringan lambat bisa sampai 15 detik.
+- **Halaman otomatis menggulir ke kartu hasil** begitu info didapat, dengan
+  petunjuk "Info didapat. Pilih format di bawah untuk mulai mengunduh."
+  Sebelumnya kartu hasil bisa berada di bawah layar dan pengguna tidak sadar
+  prosesnya sudah selesai.
+
+## Catatan
+Progres unduhan per format (bar, persen, pesan "Mengunduh…") ternyata sudah ada
+sejak sebelumnya di `MediaCard` — tidak diubah, hanya diverifikasi.
+
 ## [1.9.13] - 2026-11-02
 
 # v1.9.13 — Bottom nav rata & label tidak terpotong

@@ -8,7 +8,7 @@ export function extractLinks(text = '') {
   return Array.from(new Set(cleaned.filter(Boolean)));
 }
 
-export default function UrlInput({ url, setUrl, onFetch, loading }) {
+export default function UrlInput({ url, setUrl, onFetch, loading, elapsed = 0 }) {
   const links = extractLinks(url);
   const isMulti = links.length > 1;
 
@@ -86,15 +86,22 @@ export default function UrlInput({ url, setUrl, onFetch, loading }) {
         {loading ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin text-[#FFE600]" />
-            <span>MENGANALISIS MEDIA...</span>
+            <span>MENGAMBIL INFO{elapsed > 0 ? ` · ${elapsed}s` : '...'}</span>
           </>
         ) : (
           <>
             <ArrowRight className="w-4 h-4 text-[#38E54D]" />
-            <span>{isMulti ? `PROSES ${links.length} MEDIA` : 'ANALYZE & DOWNLOAD'}</span>
+            <span>{isMulti ? `PROSES ${links.length} TAUTAN` : 'AMBIL INFO MEDIA'}</span>
           </>
         )}
       </button>
+
+      {loading && elapsed >= 5 && (
+        <p className="text-[11px] font-mono-code font-bold text-[#121212]/55 leading-snug px-1">
+          Masih mengambil info dari platform. Jaringan lambat bisa sampai 15 detik —
+          jangan tutup halaman ini.
+        </p>
+      )}
     </div>
   );
 }
