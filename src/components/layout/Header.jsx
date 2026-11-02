@@ -50,7 +50,7 @@ export default function Header({ activeTab, setActiveTab }) {
                 v{APP_VERSION}
               </span>
             </div>
-            <span className="text-[8.5px] sm:text-[9px] font-mono-code font-bold text-[#121212]/60 tracking-wider block mt-0.5">
+            <span className="hidden sm:block text-[8.5px] sm:text-[9px] font-mono-code font-bold text-[#121212]/60 tracking-wider mt-0.5">
               MORI SUITE • BENTO
             </span>
           </div>
@@ -59,7 +59,7 @@ export default function Header({ activeTab, setActiveTab }) {
         {/* Right Tab & Action Controls */}
         <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Active Tab Badge */}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg border-2 border-[#121212] text-xs font-mono-code font-black text-[#121212] shadow-[2px_2px_0px_#121212]">
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-white rounded-lg border-2 border-[#121212] text-xs font-mono-code font-black text-[#121212] shadow-[2px_2px_0px_#121212]">
             <span className="w-2 h-2 rounded-full bg-[#38E54D] border border-[#121212] animate-pulse" />
             <span className="text-[10px] sm:text-[11px] tracking-wide">
               {getTabLabel()}

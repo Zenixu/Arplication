@@ -317,8 +317,29 @@ export default function ArMusicUI(props) {
   /* ------------------------------------------------------------------- cari */
 
   const Cari = (
+    <div className="space-y-2">
+      <YTMusicWrapper
+        playTrack={playTrack}
+        currentId={currentId}
+        playing={playing}
+        onDownload={onYtDownload}
+        onPlayError={() => {}}
+      />
+    </div>
+  );
+
+  /* ---------------------------------------------------------------- pustaka */
+
+  const libTabs = [
+    { id: 'lagu', label: 'Lagu', icon: Music2 },
+    { id: 'artis', label: 'Artis', icon: User },
+    { id: 'folder', label: 'Folder', icon: FolderOpen },
+    { id: 'playlist', label: 'Playlist', icon: ListMusic },
+  ];
+
+  const Pustaka = (
     <div className="space-y-3">
-      <div className="flex items-center gap-2 px-3 py-2 bg-white border-[2.5px] border-[#121212] rounded-xl shadow-[2.5px_2.5px_0_#121212]">
+      <div className="flex items-center gap-2 px-3 py-2 bg-white border-2 border-[#121212] rounded-xl shadow-[2px_2px_0_#121212]">
         <Search className="w-4 h-4 shrink-0" />
         <input
           value={query}
@@ -351,38 +372,12 @@ export default function ArMusicUI(props) {
               />
             ))}
             {localResults.length === 0 && (
-              <p className="text-[11px] font-mono-code font-bold text-[#121212]/40 px-1">Tidak ada di koleksi. Coba cari di YouTube Music di bawah.</p>
+              <p className="text-[11px] font-mono-code font-bold text-[#121212]/40 px-1">Tidak ada di koleksi.</p>
             )}
           </div>
         </section>
       )}
 
-      <section>
-        <h3 className="text-[10px] font-mono-code font-black uppercase tracking-widest text-[#121212]/50 mb-2">YouTube Music</h3>
-        <div className="bg-white border-[2.5px] border-[#121212] rounded-2xl shadow-[3px_3px_0_#121212] p-2.5">
-          <YTMusicWrapper
-            playTrack={playTrack}
-            currentId={currentId}
-            playing={playing}
-            onDownload={onYtDownload}
-            onPlayError={() => {}}
-          />
-        </div>
-      </section>
-    </div>
-  );
-
-  /* ---------------------------------------------------------------- pustaka */
-
-  const libTabs = [
-    { id: 'lagu', label: 'Lagu', icon: Music2 },
-    { id: 'artis', label: 'Artis', icon: User },
-    { id: 'folder', label: 'Folder', icon: FolderOpen },
-    { id: 'playlist', label: 'Playlist', icon: ListMusic },
-  ];
-
-  const Pustaka = (
-    <div className="space-y-3">
       <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {libTabs.map((t) => {
           const Icon = t.icon;
@@ -596,41 +591,37 @@ export default function ArMusicUI(props) {
         {/* ================= Kolom utama ================= */}
         <div className="flex-1 min-w-0 space-y-3 pb-2">
           {/* bar atas */}
-          <div className="flex items-center justify-between gap-2">
-            <button
-              onClick={() => setActiveTab?.('home')}
-              className="md:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-white border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212] text-[10px] font-mono-code font-black uppercase"
-            >
-              <Home className="w-3.5 h-3.5" /> Hub
-            </button>
-            <div className="hidden md:block min-w-0">
-              <h2 className="text-sm font-black uppercase tracking-tight leading-none">
+          {/* baris judul — di HP disembunyikan: tab aktif sudah menyebut halaman,
+              dan EQ/sleep tetap bisa dibuka dari pemutar layar penuh */}
+          <div className="hidden md:flex items-center justify-between gap-2">
+            <div className="min-w-0 flex items-baseline gap-2">
+              <h2 className="text-xs md:text-sm font-black uppercase tracking-tight leading-none">
                 {TABS.find((t) => t.id === tab)?.label || 'ArMusic'}
               </h2>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="md:hidden text-[10px] font-mono-code font-black bg-white px-2 py-1 rounded-md border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212]">
-                {tracks.length} LAGU
+              <span className="text-[9px] font-mono-code font-bold text-[#121212]/40">
+                {tracks.length} lagu
               </span>
+            </div>
+            <div className="flex items-center gap-1.5 md:hidden">
               <button
                 onClick={() => openSheet('eq')}
-                className={`md:hidden w-8 h-8 rounded-lg border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212] flex items-center justify-center ${eqInfo?.enabled ? 'bg-[#FFE600]' : 'bg-white'}`}
+                className={`w-7 h-7 rounded-lg border-2 border-[#121212] flex items-center justify-center ${eqInfo?.enabled ? 'bg-[#FFE600]' : 'bg-white'}`}
                 aria-label="Equalizer"
               >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
+                <SlidersHorizontal className="w-3 h-3" />
               </button>
               <button
                 onClick={() => openSheet('sleep')}
-                className={`md:hidden w-8 h-8 rounded-lg border-2 border-[#121212] shadow-[1.5px_1.5px_0_#121212] flex items-center justify-center ${sleepStatus?.active ? 'bg-[#FFE600]' : 'bg-white'}`}
+                className={`w-7 h-7 rounded-lg border-2 border-[#121212] flex items-center justify-center ${sleepStatus?.active ? 'bg-[#FFE600]' : 'bg-white'}`}
                 aria-label="Sleep timer"
               >
-                <Timer className="w-3.5 h-3.5" />
+                <Timer className="w-3 h-3" />
               </button>
             </div>
           </div>
 
           {/* tab utama — hanya di layar sempit (di layar lebar sudah jadi sidebar) */}
-          <div className="md:hidden flex gap-1 p-1 bg-white border-[2.5px] border-[#121212] rounded-xl shadow-[2.5px_2.5px_0_#121212]">
+          <div className="md:hidden flex gap-1 p-1 bg-white border-2 border-[#121212] rounded-xl shadow-[2px_2px_0_#121212]">
             {TABS.map((t) => {
               const Icon = t.icon;
               const active = tab === t.id;
@@ -638,7 +629,7 @@ export default function ArMusicUI(props) {
                 <button
                   key={t.id}
                   onClick={() => setTab(t.id)}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-[10px] font-mono-code font-black uppercase transition-all ${
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-[10px] font-mono-code font-black uppercase transition-all ${
                     active ? 'bg-[#121212] text-[#FFE600]' : 'text-[#121212]/60 hover:bg-[#F8F5EE]'
                   }`}
                 >

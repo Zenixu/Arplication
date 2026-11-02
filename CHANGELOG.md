@@ -7,6 +7,29 @@ dan proyek ini mematuhi [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ---
 
+## [1.9.7] - 2026-11-02
+
+# v1.9.7 — Bagian atas diringkas
+
+## Perbaikan
+- **Bar sebelum konten turun dari 5 lapis jadi 3** di HP: header aplikasi → tab
+  (Beranda/Cari/Pustaka) → kolom pencarian. Baris judul + jumlah lagu + tombol
+  EQ/sleep disembunyikan di HP (EQ & sleep tetap bisa dibuka dari pemutar layar
+  penuh, dan tetap tampil di sidebar layar lebar).
+- **Satu kolom pencarian saja di tab Cari.** Pencarian koleksi dipindah ke tab
+  Pustaka, tempatnya memang di situ. Sebelumnya dua kolom pencarian bertumpuk
+  dalam satu layar.
+- **Kotak berbingkai ganda di tab Cari dihapus** — panel YouTube Music tidak lagi
+  dibungkus kartu berbingkai tebal.
+- **Header global diringkas di HP**: badge tab aktif (titik hijau berdenyut) dan
+  subjudul "MORI SUITE • BENTO" disembunyikan di layar sempit — keduanya
+  duplikasi dari bottom nav dan judul aplikasi.
+- Tab utama dibuat lebih ringan (garis 2px, bayangan 2px) supaya tidak bersaing
+  dengan kartu konten.
+
+## Catatan
+- Tombol "Hub" di dalam ArMusic dihapus — bottom nav sudah punya HUB.
+
 ## [1.9.6] - 2026-11-02
 
 # v1.9.6 — Layout baru: fokus ke musik
